@@ -1,12 +1,26 @@
-<!doctype html>
-<html> 
- <head> 
-  <title>backlink builder for search engine ranking</title> 
- </head> 
- <body> 
-  <link href="https://backlink-generator-tool.github.io/backlink-generator-tool/stealth-iframe.css" rel="stylesheet"> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://image.thum.io; font-src 'self' data:; connect-src *; frame-src http: https:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>backlink builder for search engine ranking</title>
+  <meta name="description" content="Backlink Builder For Search Engine Ranking: paste a page URL and let the tool fill every URL template, open each target and export the full list.">
+  <link rel="canonical" href="https://backlink.is-an.ai/demo/backlink-builder-for-search-engine-ranking.html">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="theme-color" content="#2563eb">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Backlink Generator Tool">
+  <meta property="og:title" content="backlink builder for search engine ranking">
+  <meta property="og:description" content="Backlink Builder For Search Engine Ranking: paste a page URL and let the tool fill every URL template, open each target and export the full list.">
+  <meta property="og:url" content="https://backlink.is-an.ai/demo/backlink-builder-for-search-engine-ranking.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="backlink builder for search engine ranking">
+  <meta name="twitter:description" content="Backlink Builder For Search Engine Ranking: paste a page URL and let the tool fill every URL template, open each target and export the full list.">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../stealth-iframe.css">
   <style>
-  /* ======================================================
+/* ======================================================
      Color theory: triadic palette + complementary accents
      ------------------------------------------------------
      Primary   : Indigo/Blue  (#4f46e5)
@@ -186,7 +200,12 @@
     #advancedPanel label{ grid-template-columns: 1fr; }
     .promo-grid{ grid-template-columns: 1fr; }
   }
-</style> 
+  </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Backlink Builder For Search Engine Ranking — Backlink Generator Tool","url":"https://backlink.is-an.ai/demo/backlink-builder-for-search-engine-ranking.html","applicationCategory":"SEO Tool","operatingSystem":"Any (browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"F9XR Team","url":"https://f9xr.org"}}</script>
+</head>
+<body> 
+   
+   
   <div class="page-wrap"> <!-- =========================
        TOOL (kept at top)
        ========================= --> 
@@ -196,26 +215,28 @@
      <p class="hero-sub">Auto Submission • YouTube Backlinks • Instant Indexing • Traffic Booster • IFrame / Popup / Tab / Ping</p> 
     </div> <!-- >>> DO NOT MODIFY IDS OR STRUCTURE BELOW <<< --> 
     <div id="controls"> 
-     <input id="urlInput" type="text" placeholder="Enter your page URL…" size="50"> <button id="startBtn">Generate Backlinks</button> <button id="toggleAdvancedBtn">⚙️ Advanced ▼</button> 
+     <input id="urlInput" aria-label="Page URL to promote" type="text" placeholder="Enter your page URL…" size="50"> <button id="startBtn">Generate Backlinks</button> <button id="toggleAdvancedBtn">⚙️ Advanced ▼</button> 
     </div> 
-    <div id="advancedPanel" style="display: none;"> <label>Mode: <select id="modeSelect"> <option value="iframe">IFrame</option> <option value="popup">Popup</option> <option value="tab">Tab</option> <option value="ping">Ping</option> </select> </label> <label>Popup/Tab behavior: <select id="reuseToggle"> <option value="fresh">Open → goto → wait → close</option> <option value="reuse">Reuse same window/tab</option> </select> </label> <label>Max Concurrent: <input id="concurrencyRange" type="range" min="1" max="50" value="5"> <span id="concurrentCount">5</span> </label> <label><input type="checkbox" id="rerunCheckbox"> Repeat after completion</label> <label><input type="checkbox" id="shuffleCheckbox" checked> Shuffle templates before run</label> <!-- Static disclaimer (no extra JS allowed) --> 
+    <div id="advancedPanel" style="display: none;"> <label>Mode: <select id="modeSelect"> <option value="iframe">IFrame</option> <option value="popup">Popup</option> <option value="tab">Tab</option> <option value="ping">Ping</option> </select> </label> <label>Popup/Tab behavior: <select id="reuseToggle"> <option value="fresh">Open → goto → wait → close</option> <option value="reuse">Reuse same window/tab</option> </select> </label> <label>Max Concurrent: <input id="concurrencyRange" type="range" min="1" max="50" value="5"> <span id="concurrentCount">5</span> </label> <label><input type="checkbox" id="rerunCheckbox"> Repeat after completion</label>
+     <label>Max URLs per run: <select id="batchLimit"><option value="0">All templates</option><option value="100">100</option><option value="250">250</option><option value="500">500</option><option value="1000">1,000</option></select></label>
+     <label><input type="checkbox" id="waybackCheckbox"> Also submit to the Wayback Machine (optional, sends the URL to web.archive.org)</label> <label><input type="checkbox" id="shuffleCheckbox" checked> Shuffle templates before run</label> <!-- Static disclaimer (no extra JS allowed) --> 
      <div class="popup-note">
        ⚠️ Using <strong>Popup</strong> or <strong>Tab</strong>? Allow pop-ups for this site in your browser, otherwise windows may be blocked. 
      </div> 
     </div> 
     <div id="shareControls"> 
-     <input id="newUrl" type="text" readonly placeholder="Shareable URL appears here…"> <button id="copyBtn">Copy</button> 
+     <input id="newUrl" aria-label="Shareable URL" type="text" readonly placeholder="Shareable URL appears here…"> <button id="copyBtn">Copy</button> 
     </div> <button id="downloadBtn">Download URLs</button> <a id="externalLink" href="#" style="margin-top: 0.8em; margin-left: 0.8em; font-weight: bold;" target="_self"> 🔗 Open Test </a> 
     <div id="progressContainer"> 
      <div style="background:#ddd; height:20px; border-radius:10px;"> 
       <div id="progressBar" style="height:100%; width:0%; background:#4caf50;"></div> 
      </div> 
-     <div id="progressText">
+     <div id="progressText" aria-live="polite">
       0/0 (0%)
      </div> 
     </div> <!-- Screenshot BEFORE results (src managed by website-screenshot-preview.js) --> 
-    <img id="previewwebsite" alt="Website Screenshot"> 
-    <ul id="results" class="results-list"></ul> 
+    <img id="previewwebsite" loading="lazy" referrerpolicy="no-referrer" alt="Website Screenshot"> 
+    <ul id="results" aria-live="polite" class="results-list"></ul> 
    </div> <!-- =========================
        LONG-FORM SEO CONTENT
        ========================= --> 
@@ -258,42 +279,42 @@
      <li><strong>YouTube backlinks:</strong> Update descriptions, then run a mixed batch to encourage faster discovery.</li> 
     </ul> 
     <h2 id="promote">Promote / Referral Links — Free Traffic &amp; Backlink Exchanges</h2> 
-    <p> Multiply results by promoting your <strong>Shareable URL</strong> so other users trigger it for you. Start with our featured pick — <a href="https://www.followlike.net/?r=19384926" target="_blank" rel="nofollow">FollowLike</a> — then rotate a few more to sustain steady <em>auto submission</em>, <em>traffic booster</em> signals, and <em>link indexing</em>. </p> 
+    <p> Multiply results by promoting your <strong>Shareable URL</strong> so other users trigger it for you. Start with our featured pick — <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="nofollow sponsored noopener">FollowLike</a> — then rotate a few more to sustain steady <em>auto submission</em>, <em>traffic booster</em> signals, and <em>link indexing</em>. </p> 
     <div class="promo-grid"> 
      <div class="promo"> 
       <h3>🔥 FollowLike (Featured)</h3> 
-      <p><a href="https://www.followlike.net/?r=19384926" target="_blank" rel="nofollow">https://www.followlike.net/?r=19384926</a> — paste your <strong>Shareable URL</strong> for continuous background runs that improve crawl paths and support instant indexing.</p> 
+      <p><a href="https://www.followlike.net/?r=19265371" target="_blank" rel="nofollow sponsored noopener">https://www.followlike.net/?r=19265371</a> — paste your <strong>Shareable URL</strong> for continuous background runs that improve crawl paths and support instant indexing.</p> 
      </div> 
      <div class="promo"> 
       <h3>🚀 AddMeFast</h3> 
-      <p><a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank" rel="nofollow">https://addmefast.com/?ref=SZ8JCOJL</a> — social spikes for <em>website promotion</em> and reach.</p> 
+      <p><a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank" rel="nofollow sponsored noopener">https://addmefast.com/?ref=SZ8JCOJL</a> — social spikes for <em>website promotion</em> and reach.</p> 
      </div> 
      <div class="promo"> 
       <h3>💠 2Pink</h3> 
-      <p><a href="https://2pink.org/dang-ky?ref=119334" target="_blank" rel="nofollow">https://2pink.org/dang-ky?ref=119334</a> — simple way to keep this <em>backlink generator</em> firing via your Shareable URL.</p> 
+      <p><a href="https://2pink.org/dang-ky?ref=119334" target="_blank" rel="nofollow sponsored noopener">https://2pink.org/dang-ky?ref=119334</a> — simple way to keep this <em>backlink generator</em> firing via your Shareable URL.</p> 
      </div> 
      <div class="promo"> 
       <h3>📈 RankBoostUp</h3> 
-      <p><a href="https://rankboostup.com/?refid=510070" target="_blank" rel="nofollow">https://rankboostup.com/?refid=510070</a> — steady <em>traffic booster</em> to support <em>crawl discovery</em>.</p> 
+      <p><a href="https://rankboostup.com/?refid=510070" target="_blank" rel="nofollow sponsored noopener">https://rankboostup.com/?refid=510070</a> — steady <em>traffic booster</em> to support <em>crawl discovery</em>.</p> 
      </div> 
      <div class="promo"> 
       <h3>🔁 Hit4Hit</h3> 
-      <p><a href="https://www.hit4hit.org/?ref=mart192a" target="_blank" rel="nofollow">https://www.hit4hit.org/?ref=mart192a</a> — easy rotation to keep endpoints warm and indexing signals frequent.</p> 
+      <p><a href="https://www.hit4hit.org/?ref=mart192a" target="_blank" rel="nofollow sponsored noopener">https://www.hit4hit.org/?ref=mart192a</a> — easy rotation to keep endpoints warm and indexing signals frequent.</p> 
      </div> 
      <div class="promo"> 
       <h3>⚡ Everve</h3> 
-      <p><a href="https://everve.net/ref/343736/" target="_blank" rel="nofollow">https://everve.net/ref/343736/</a> — flexible boosts for <em>search engine visibility</em> and <em>domain authority growth</em>.</p> 
+      <p><a href="https://everve.net/ref/343736/" target="_blank" rel="nofollow sponsored noopener">https://everve.net/ref/343736/</a> — flexible boosts for <em>search engine visibility</em> and <em>domain authority growth</em>.</p> 
      </div> 
     </div> 
     <div class="cta">
       Scale your “Free backlink maker generator builder online tool” workflow: 
-     <br>Primary pick → <a href="https://www.followlike.net/?r=19384926" target="_blank" rel="nofollow">FollowLike</a> 
+     <br>Primary pick → <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="nofollow sponsored noopener">FollowLike</a> 
      <div style="margin-top:8px; font-size:.95rem; font-weight:700;">
-       Also rotate: <a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank" rel="nofollow">AddMeFast</a> • <a href="https://2pink.org/dang-ky?ref=119334" target="_blank" rel="nofollow">2Pink</a> • <a href="https://rankboostup.com/?refid=510070" target="_blank" rel="nofollow">RankBoostUp</a> • <a href="https://www.hit4hit.org/?ref=mart192a" target="_blank" rel="nofollow">Hit4Hit</a> • <a href="https://everve.net/ref/343736/" target="_blank" rel="nofollow">Everve</a> 
+       Also rotate: <a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank" rel="nofollow sponsored noopener">AddMeFast</a> • <a href="https://2pink.org/dang-ky?ref=119334" target="_blank" rel="nofollow sponsored noopener">2Pink</a> • <a href="https://rankboostup.com/?refid=510070" target="_blank" rel="nofollow sponsored noopener">RankBoostUp</a> • <a href="https://www.hit4hit.org/?ref=mart192a" target="_blank" rel="nofollow sponsored noopener">Hit4Hit</a> • <a href="https://everve.net/ref/343736/" target="_blank" rel="nofollow sponsored noopener">Everve</a> 
      </div> 
     </div> 
     <div class="protip">
-      Pro Tip: repost your <strong>Shareable URL</strong> weekly on <a href="https://www.followlike.net/?r=19384926" target="_blank" rel="nofollow">FollowLike</a>, echo on <a href="https://2pink.org/dang-ky?ref=119334" target="_blank" rel="nofollow">2Pink</a> and <a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank" rel="nofollow">AddMeFast</a> for sustained momentum. 
+      Pro Tip: repost your <strong>Shareable URL</strong> weekly on <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="nofollow sponsored noopener">FollowLike</a>, echo on <a href="https://2pink.org/dang-ky?ref=119334" target="_blank" rel="nofollow sponsored noopener">2Pink</a> and <a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank" rel="nofollow sponsored noopener">AddMeFast</a> for sustained momentum. 
     </div> 
     <h2 id="faqs">FAQs</h2> 
     <p><strong>Is this safe?</strong> It runs client-side in your browser and targets public endpoints widely used for discovery, archiving, and sharing.</p> 
@@ -304,11 +325,15 @@
     <h2 id="community">Community</h2> 
     <p>🗨️ If you know a high-quality backlink or ping submission service, drop it in the comments and we might add it to the system.</p> 
    </div> 
-  </div> 
+  </div>
+  <footer class="bgt-footer">
+    <p>Backlink Generator Tool — free, client-side SEO utility.</p>
+    <p>Enhanced by <a href="https://f9xr.org" target="_blank" rel="noopener">F9XR Team</a> · <a href="../index.html">Open the main tool</a></p>
+  </footer>
   <noscript> 
    <p><strong>JavaScript required:</strong> enable JavaScript to run the Backlink Generator.</p> 
   </noscript> 
-  <script src="https://backlink-generator-tool.github.io/backlink-generator-tool/backlink-generator.js"></script> 
-  <script src="https://backlink-generator-tool.github.io/backlink-generator-tool/website-screenshot-preview.js"></script>  
+  <script src="../backlink-generator.js"></script> 
+  <script src="../website-screenshot-preview.js"></script>  
  </body>
 </html>

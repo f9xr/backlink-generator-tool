@@ -1,0 +1,25 @@
+name: Validate site
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Syntax check
+        run: |
+          node --check backlink-generator.js
+          node --check website-screenshot-preview.js
+      - name: Validate templates, demo pages and site files
+        run: node tools/validate-site.js
+      - name: Engine unit checks
+        run: node tools/check-engine.js
+      - name: Engine UI wiring check
+        run: node tools/check-ui.js

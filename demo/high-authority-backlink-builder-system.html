@@ -1,10 +1,24 @@
-<!doctype html>
-<html> 
- <head> 
-  <title>high authority backlink builder system</title> 
- </head> 
- <body> 
-  <link href="https://backlink-generator-tool.github.io/backlink-generator-tool/stealth-iframe.css" rel="stylesheet"> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://image.thum.io; font-src 'self' data:; connect-src *; frame-src http: https:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>high authority backlink builder system</title>
+  <meta name="description" content="High Authority Backlink Builder System: bulk backlink and index-discovery runs from a single URL. No account, no server, no install.">
+  <link rel="canonical" href="https://backlink.is-an.ai/demo/high-authority-backlink-builder-system.html">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="theme-color" content="#2563eb">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Backlink Generator Tool">
+  <meta property="og:title" content="high authority backlink builder system">
+  <meta property="og:description" content="High Authority Backlink Builder System: bulk backlink and index-discovery runs from a single URL. No account, no server, no install.">
+  <meta property="og:url" content="https://backlink.is-an.ai/demo/high-authority-backlink-builder-system.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="high authority backlink builder system">
+  <meta name="twitter:description" content="High Authority Backlink Builder System: bulk backlink and index-discovery runs from a single URL. No account, no server, no install.">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../stealth-iframe.css">
   <style>
 :root {
   --primary: #4a90e2;
@@ -400,31 +414,38 @@ input[type="checkbox"] {
     border-radius: 12px;
   }
 }
-</style> 
+  </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"High Authority Backlink Builder System — Backlink Generator Tool","url":"https://backlink.is-an.ai/demo/high-authority-backlink-builder-system.html","applicationCategory":"SEO Tool","operatingSystem":"Any (browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"F9XR Team","url":"https://f9xr.org"}}</script>
+</head>
+<body> 
+   
+   
   <div class="hero-card"> 
    <h1 class="hero-title">Free Backlink Maker Generator Builder Online Tool</h1> 
    <p class="hero-subtitle">Instant auto submission &amp; URL pinger for website promotion &amp; YouTube backlinks. Generate quality backlinks using IFrame, Popup, Tab, or Ping modes. Download your URL list for continuous promotion.</p> 
    <div id="controls"> 
-    <input id="urlInput" type="text" placeholder="Enter your page URL…" size="50"> <button id="startBtn">Generate Backlinks</button> <button id="toggleAdvancedBtn">⚙️ Advanced ▼</button> 
+    <input id="urlInput" aria-label="Page URL to promote" type="text" placeholder="Enter your page URL…" size="50"> <button id="startBtn">Generate Backlinks</button> <button id="toggleAdvancedBtn">⚙️ Advanced ▼</button> 
    </div> 
-   <div id="advancedPanel" style="display: none;"> <label>Mode: <select id="modeSelect"> <option value="iframe">IFrame</option> <option value="popup">Popup</option> <option value="tab">Tab</option> <option value="ping">Ping</option> </select> </label> <label>Popup/Tab behavior: <select id="reuseToggle"> <option value="fresh">Open → goto → wait → close</option> <option value="reuse">Reuse same window/tab</option> </select> </label> <label>Max Concurrent: <input id="concurrencyRange" type="range" min="1" max="50" value="5"> <span id="concurrentCount">5</span> </label> <label><input type="checkbox" id="rerunCheckbox"> Repeat after completion</label> <label><input type="checkbox" id="shuffleCheckbox" checked> Shuffle templates before run</label> 
+   <div id="advancedPanel" style="display: none;"> <label>Mode: <select id="modeSelect"> <option value="iframe">IFrame</option> <option value="popup">Popup</option> <option value="tab">Tab</option> <option value="ping">Ping</option> </select> </label> <label>Popup/Tab behavior: <select id="reuseToggle"> <option value="fresh">Open → goto → wait → close</option> <option value="reuse">Reuse same window/tab</option> </select> </label> <label>Max Concurrent: <input id="concurrencyRange" type="range" min="1" max="50" value="5"> <span id="concurrentCount">5</span> </label> <label><input type="checkbox" id="rerunCheckbox"> Repeat after completion</label>
+     <label>Max URLs per run: <select id="batchLimit"><option value="0">All templates</option><option value="100">100</option><option value="250">250</option><option value="500">500</option><option value="1000">1,000</option></select></label>
+     <label><input type="checkbox" id="waybackCheckbox"> Also submit to the Wayback Machine (optional, sends the URL to web.archive.org)</label> <label><input type="checkbox" id="shuffleCheckbox" checked> Shuffle templates before run</label> 
     <div class="popup-disclaimer">
       ⚠️ If you choose <strong>Mode: Popup/Tab</strong>, please allow pop-ups for this site in your browser. If no windows open, your browser likely blocked the pop-up. 
     </div> 
    </div> 
    <div id="shareControls"> 
-    <input id="newUrl" type="text" readonly placeholder="Shareable URL appears here…"> <button id="copyBtn">Copy</button> 
+    <input id="newUrl" aria-label="Shareable URL" type="text" readonly placeholder="Shareable URL appears here…"> <button id="copyBtn">Copy</button> 
    </div> <button id="downloadBtn">Download URLs</button> <a id="externalLink" href="#" style="margin-top: 0.8em; margin-left: 0.8em; font-weight: bold;" target="_self"> 🔗 Open Test </a> 
    <div id="progressContainer"> 
     <div style="background:#ddd; height:20px; border-radius:10px;"> 
      <div id="progressBar" style="height:100%; width:0%; background:#4caf50;"></div> 
     </div> 
-    <div id="progressText">
+    <div id="progressText" aria-live="polite">
      0/0 (0%)
     </div> 
    </div> 
-   <img id="previewwebsite" alt="Website Screenshot"> 
-   <ul id="results" class="results-list"></ul> 
+   <img id="previewwebsite" loading="lazy" referrerpolicy="no-referrer" alt="Website Screenshot"> 
+   <ul id="results" aria-live="polite" class="results-list"></ul> 
   </div> 
   <div class="content-section"> 
    <h2>Free Backlink Maker Generator Builder Online Tool – Complete Guide</h2> 
@@ -449,7 +470,7 @@ input[type="checkbox"] {
     <p>The tool supports four distinct operational modes: IFrame embedding, Popup windows, Tab navigation, and direct URL pinging - giving you comprehensive coverage for <strong>link indexing</strong> and <strong>crawl discovery</strong>. Each mode serves different purposes in the <strong>instant indexing</strong> ecosystem, from generating <strong>social signals</strong> to triggering archival services.</p> 
     <div class="cta-panel"> 
      <h3>Boost Your Results with Professional Traffic Exchanges</h3> 
-     <p>For maximum <strong>traffic booster</strong> effects, combine this tool with <a href="https://www.followlike.net/?r=19384926" target="_blank">FollowLike.net</a> - the premier platform for <strong>website promotion</strong> and <strong>social signals</strong> generation.</p> 
+     <p>For maximum <strong>traffic booster</strong> effects, combine this tool with <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.net</a> - the premier platform for <strong>website promotion</strong> and <strong>social signals</strong> generation.</p> 
     </div> 
    </div> 
    <div id="how-it-works"> 
@@ -463,7 +484,7 @@ input[type="checkbox"] {
      <li>Link monitoring services that track your <strong>link indexing</strong> progress</li> 
     </ul> 
     <p>The shuffle functionality ensures your submissions appear organic, while the reuse tab/window feature maximizes efficiency during extended <strong>website promotion</strong> campaigns.</p> 
-    <div class="pro-tip"> <strong>Pro Tip:</strong> For continuous <strong>domain authority growth</strong>, run this <strong>backlink generator</strong> while simultaneously using <a href="https://www.followlike.net/?r=19384926" target="_blank">FollowLike.net</a> to create authentic traffic patterns that supercharge your <strong>search engine visibility</strong>. 
+    <div class="pro-tip"> <strong>Pro Tip:</strong> For continuous <strong>domain authority growth</strong>, run this <strong>backlink generator</strong> while simultaneously using <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.net</a> to create authentic traffic patterns that supercharge your <strong>search engine visibility</strong>. 
     </div> 
    </div> 
    <div id="seo-benefits"> 
@@ -498,7 +519,7 @@ input[type="checkbox"] {
     <p><strong>Repetition with Shuffle:</strong> Enable both repeat and shuffle options for extended campaigns. This approach maximizes <strong>link indexing</strong> diversity while minimizing pattern detection.</p> 
     <p><strong>Batch Processing:</strong> Create multiple <strong>Shareable URLs</strong> for different pages and process them in sequence. This technique is particularly effective for <strong>YouTube backlinks</strong> where you might want to promote multiple videos from the same channel.</p> 
     <p><strong>Sitemap Integration:</strong> Combine this tool with your XML sitemap by processing key URLs regularly. This creates a powerful synergy between traditional <strong>crawl discovery</strong> and active <strong>auto submission</strong>.</p> 
-    <div class="pro-tip"> <strong>Advanced Strategy:</strong> Run this <strong>backlink maker</strong> while simultaneously using <a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank">AddMeFast</a> and <a href="https://www.followlike.net/?r=19384926" target="_blank">FollowLike.net</a> to create a comprehensive <strong>traffic booster</strong> ecosystem that drives both <strong>social signals</strong> and <strong>link indexing</strong>. 
+    <div class="pro-tip"> <strong>Advanced Strategy:</strong> Run this <strong>backlink maker</strong> while simultaneously using <a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank" rel="sponsored nofollow noopener">AddMeFast</a> and <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.net</a> to create a comprehensive <strong>traffic booster</strong> ecosystem that drives both <strong>social signals</strong> and <strong>link indexing</strong>. 
     </div> 
    </div> 
    <div id="troubleshooting"> 
@@ -513,67 +534,67 @@ input[type="checkbox"] {
     <h3>7. Promote / Referral Link – Free Traffic &amp; Backlink Exchanges</h3> 
     <div class="cta-panel"> 
      <h3>Maximize Your Results with Professional Platforms</h3> 
-     <p>For ultimate <strong>traffic booster</strong> effects and to <strong>rank YouTube videos faster</strong>, combine this tool with <a href="https://www.followlike.net/?r=19384926" target="_blank">FollowLike.net</a> - the industry leader in authentic traffic generation and <strong>social signals</strong>.</p> 
+     <p>For ultimate <strong>traffic booster</strong> effects and to <strong>rank YouTube videos faster</strong>, combine this tool with <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.net</a> - the industry leader in authentic traffic generation and <strong>social signals</strong>.</p> 
     </div> 
     <p>To supercharge your <strong>website promotion</strong> efforts, integrate these premium traffic and backlink exchange platforms into your strategy. These services work synergistically with this <strong>backlink generator</strong> to create comprehensive <strong>search engine visibility</strong> campaigns.</p> 
     <div class="promo-grid"> 
      <div class="promo-card"> 
       <h4>FollowLike Network</h4> 
-      <p><a href="https://www.followlike.net/?r=19384926" target="_blank">FollowLike.net</a> - Premium social exchange for <strong>website promotion</strong> and <strong>YouTube backlinks</strong> that generates authentic <strong>social signals</strong>.</p> 
+      <p><a href="https://www.followlike.net/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.net</a> - Premium social exchange for <strong>website promotion</strong> and <strong>YouTube backlinks</strong> that generates authentic <strong>social signals</strong>.</p> 
      </div> 
      <div class="promo-card"> 
       <h4>AddMeFast System</h4> 
-      <p><a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank">AddMeFast</a> - Comprehensive <strong>traffic booster</strong> platform that enhances <strong>link indexing</strong> through diverse engagement signals.</p> 
+      <p><a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank" rel="sponsored nofollow noopener">AddMeFast</a> - Comprehensive <strong>traffic booster</strong> platform that enhances <strong>link indexing</strong> through diverse engagement signals.</p> 
      </div> 
      <div class="promo-card"> 
       <h4>YouLikeHits Platform</h4> 
-      <p><a href="https://www.youlikehits.com/?id=3509858" target="_blank">YouLikeHits</a> - Powerful <strong>index booster</strong> that accelerates <strong>crawl discovery</strong> through targeted social engagement.</p> 
+      <p><a href="https://www.youlikehits.com/?id=3509858" target="_blank" rel="noopener">YouLikeHits</a> - Powerful <strong>index booster</strong> that accelerates <strong>crawl discovery</strong> through targeted social engagement.</p> 
      </div> 
      <div class="promo-card"> 
       <h4>RankBoostUp Service</h4> 
-      <p><a href="https://rankboostup.com/?refid=510070" target="_blank">RankBoostUp</a> - Specialized <strong>URL pinger</strong> and <strong>archive submit</strong> service designed for <strong>instant indexing</strong>.</p> 
+      <p><a href="https://rankboostup.com/?refid=510070" target="_blank" rel="sponsored nofollow noopener">RankBoostUp</a> - Specialized <strong>URL pinger</strong> and <strong>archive submit</strong> service designed for <strong>instant indexing</strong>.</p> 
      </div> 
     </div> 
-    <div class="pro-tip"> <strong>Pro Strategy:</strong> Paste your <strong>Shareable URL</strong> from this <strong>backlink maker</strong> into <a href="https://www.followlike.net/?r=19384926" target="_blank">FollowLike.net</a> and <a href="https://2pink.org/dang-ky?ref=119334" target="_blank">2Pink.org</a> to create an automated loop of <strong>auto submission</strong> and genuine traffic that dramatically improves <strong>search engine visibility</strong>. 
+    <div class="pro-tip"> <strong>Pro Strategy:</strong> Paste your <strong>Shareable URL</strong> from this <strong>backlink maker</strong> into <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.net</a> and <a href="https://2pink.org/dang-ky?ref=119334" target="_blank" rel="sponsored nofollow noopener">2Pink.org</a> to create an automated loop of <strong>auto submission</strong> and genuine traffic that dramatically improves <strong>search engine visibility</strong>. 
     </div> 
     <h4>Recommended Weekly Rotation</h4> 
     <div class="rotation-list"> 
      <p>For continuous <strong>domain authority growth</strong>, follow this weekly rotation:</p> 
      <ul> 
-      <li><strong>Monday:</strong> <a href="https://www.followlike.net/?r=19384926" target="_blank">FollowLike.net</a> + This <strong>backlink generator</strong></li> 
-      <li><strong>Wednesday:</strong> <a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank">AddMeFast</a> + Ping mode for quick <strong>index booster</strong> effects</li> 
-      <li><strong>Friday:</strong> <a href="https://2pink.org/dang-ky?ref=119334" target="_blank">2Pink.org</a> + <a href="https://rankboostup.com/?refid=510070" target="_blank">RankBoostUp</a> for comprehensive <strong>website promotion</strong></li> 
-      <li><strong>Sunday:</strong> <a href="https://www.hit4hit.org/?ref=mart192a" target="_blank">Hit4Hit</a> + Popup mode for maximum <strong>crawl discovery</strong></li> 
+      <li><strong>Monday:</strong> <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.net</a> + This <strong>backlink generator</strong></li> 
+      <li><strong>Wednesday:</strong> <a href="https://addmefast.com/?ref=SZ8JCOJL" target="_blank" rel="sponsored nofollow noopener">AddMeFast</a> + Ping mode for quick <strong>index booster</strong> effects</li> 
+      <li><strong>Friday:</strong> <a href="https://2pink.org/dang-ky?ref=119334" target="_blank" rel="sponsored nofollow noopener">2Pink.org</a> + <a href="https://rankboostup.com/?refid=510070" target="_blank" rel="sponsored nofollow noopener">RankBoostUp</a> for comprehensive <strong>website promotion</strong></li> 
+      <li><strong>Sunday:</strong> <a href="https://www.hit4hit.org/?ref=mart192a" target="_blank" rel="sponsored nofollow noopener">Hit4Hit</a> + Popup mode for maximum <strong>crawl discovery</strong></li> 
      </ul> 
     </div> 
     <p>Additional premium platforms for specialized needs:</p> 
     <ul> 
-     <li><a href="http://folllike.com/?19384926" target="_blank">Folllike.com</a> - Alternative social signals for <strong>YouTube backlinks</strong></li> 
-     <li><a href="https://www.followlike.info/?r=19384926" target="_blank">FollowLike.info</a> - Secondary network for expanded <strong>social signals</strong></li> 
-     <li><a href="https://www.like4like.org/buy-instagram-likes.php?ref=new_account" target="_blank">Like4Like</a> - Comprehensive engagement for <strong>rank YouTube videos faster</strong></li> 
-     <li><a href="https://www.10khits.com/?ref=319049" target="_blank">10kHits</a> - Massive <strong>traffic booster</strong> with advanced targeting</li> 
-     <li><a href="https://livetraffic.net/login?refer=119334" target="_blank">LiveTraffic</a> - Real-time <strong>URL pinger</strong> and monitoring system</li> 
-     <li><a href="https://www.ytmonster.net/r/NewAccount" target="_blank">YTMonster</a> - Specialized <strong>YouTube backlinks</strong> and engagement</li> 
-     <li><a href="http://kingdomlikes.com/?ref=AMUaOjUA2J" target="_blank">KingdomLikes</a> - Royal treatment for your <strong>website promotion</strong></li> 
-     <li><a href="https://likestool.com/ref/5KLun5m" target="_blank">LikesTool</a> - All-in-one <strong>auto submission</strong> and engagement</li> 
-     <li><a href="https://everve.net/ref/343736/" target="_blank">Everve</a> - Monetized social network for professional <strong>domain authority growth</strong></li> 
+     <li><a href="http://folllike.com/?19265371" target="_blank" rel="noopener">Folllike.com</a> - Alternative social signals for <strong>YouTube backlinks</strong></li> 
+     <li><a href="https://www.followlike.info/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.info</a> - Secondary network for expanded <strong>social signals</strong></li> 
+     <li><a href="https://www.like4like.org/buy-instagram-likes.php?ref=new_account" target="_blank" rel="sponsored nofollow noopener">Like4Like</a> - Comprehensive engagement for <strong>rank YouTube videos faster</strong></li> 
+     <li><a href="https://www.10khits.com/?ref=319049" target="_blank" rel="sponsored nofollow noopener">10kHits</a> - Massive <strong>traffic booster</strong> with advanced targeting</li> 
+     <li><a href="https://livetraffic.net/login?refer=119334" target="_blank" rel="noopener">LiveTraffic</a> - Real-time <strong>URL pinger</strong> and monitoring system</li> 
+     <li><a href="https://www.ytmonster.net/r/NewAccount" target="_blank" rel="noopener">YTMonster</a> - Specialized <strong>YouTube backlinks</strong> and engagement</li> 
+     <li><a href="http://kingdomlikes.com/?ref=AMUaOjUA2J" target="_blank" rel="sponsored nofollow noopener">KingdomLikes</a> - Royal treatment for your <strong>website promotion</strong></li> 
+     <li><a href="https://likestool.com/ref/5KLun5m" target="_blank" rel="sponsored nofollow noopener">LikesTool</a> - All-in-one <strong>auto submission</strong> and engagement</li> 
+     <li><a href="https://everve.net/ref/343736/" target="_blank" rel="sponsored nofollow noopener">Everve</a> - Monetized social network for professional <strong>domain authority growth</strong></li> 
     </ul> 
     <div class="compliance-note">
       Always follow platform rules and terms of service. Rotate your creatives and avoid spam-like behavior. Quality engagement always outperforms quantity in long-term <strong>search engine visibility</strong>. 
     </div> 
     <div class="cta-panel"> 
      <h3>Ready for Maximum Impact?</h3> 
-     <p>Start with <a href="https://www.followlike.net/?r=19384926" target="_blank">FollowLike.net</a> today and experience the power of combined <strong>auto submission</strong> and genuine traffic generation for unprecedented <strong>website promotion</strong> results.</p> 
+     <p>Start with <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.net</a> today and experience the power of combined <strong>auto submission</strong> and genuine traffic generation for unprecedented <strong>website promotion</strong> results.</p> 
     </div> 
    </div> 
    <div id="use-cases"> 
     <h3>8. Use Cases &amp; Playbooks</h3> 
-    <p><strong>E-commerce Product Pages:</strong> Use this <strong>free backlink maker generator builder online tool</strong> to create immediate <strong>crawl discovery</strong> for new product listings. Combine with <a href="https://www.followlike.net/?r=19384926" target="_blank">FollowLike.net</a> for comprehensive product launch campaigns.</p> 
+    <p><strong>E-commerce Product Pages:</strong> Use this <strong>free backlink maker generator builder online tool</strong> to create immediate <strong>crawl discovery</strong> for new product listings. Combine with <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.net</a> for comprehensive product launch campaigns.</p> 
     <p><strong>Affiliate Articles:</strong> Speed up <strong>link indexing</strong> for time-sensitive affiliate content. The <strong>instant indexing</strong> capabilities ensure your content gets crawled before commission rates change.</p> 
     <p><strong>SaaS Landing Pages:</strong> Implement weekly <strong>auto submission</strong> routines for your key landing pages to maintain consistent <strong>search engine visibility</strong> and support <strong>domain authority growth</strong>.</p> 
     <p><strong>Blogs &amp; News Sites:</strong> Use the <strong>URL pinger</strong> functionality immediately after publishing new content to trigger rapid <strong>archive submit</strong> and indexing processes.</p> 
     <p><strong>Local Business Pages:</strong> Create consistent <strong>social signals</strong> and citation patterns that improve local search performance through diversified <strong>website promotion</strong>.</p> 
-    <p><strong>YouTube Video Promotion:</strong> Specifically for <strong>YouTube backlinks</strong>, use Popup mode combined with <a href="https://www.ytmonster.net/r/NewAccount" target="_blank">YTMonster</a> to <strong>rank YouTube videos faster</strong> through combined link and engagement signals.</p> 
+    <p><strong>YouTube Video Promotion:</strong> Specifically for <strong>YouTube backlinks</strong>, use Popup mode combined with <a href="https://www.ytmonster.net/r/NewAccount" target="_blank" rel="noopener">YTMonster</a> to <strong>rank YouTube videos faster</strong> through combined link and engagement signals.</p> 
    </div> 
    <div id="legal"> 
     <h3>9. Legal &amp; Disclaimer</h3> 
@@ -585,10 +606,14 @@ input[type="checkbox"] {
    <div id="community"> 
     <h3>10. Community Invite</h3> 
     <p>🗨️ <strong>Community Knowledge Sharing:</strong> If you know a high-quality backlink or ping submission service that should be included in our system, drop it in the comments below! We regularly review community suggestions and may add valuable services to future updates of this <strong>backlink generator</strong>.</p> 
-    <p>Share your success stories with this <strong>free backlink maker generator builder online tool</strong> and how you've integrated it with platforms like <a href="https://www.followlike.net/?r=19384926" target="_blank">FollowLike.net</a> for maximum <strong>traffic booster</strong> effects and <strong>domain authority growth</strong>.</p> 
+    <p>Share your success stories with this <strong>free backlink maker generator builder online tool</strong> and how you've integrated it with platforms like <a href="https://www.followlike.net/?r=19265371" target="_blank" rel="sponsored nofollow noopener">FollowLike.net</a> for maximum <strong>traffic booster</strong> effects and <strong>domain authority growth</strong>.</p> 
    </div> 
   </div> 
-  <script src="https://backlink-generator-tool.github.io/backlink-generator-tool/backlink-generator.js"></script> 
-  <script src="https://backlink-generator-tool.github.io/backlink-generator-tool/website-screenshot-preview.js"></script>  
- </body>
+  <script src="../backlink-generator.js"></script> 
+  <script src="../website-screenshot-preview.js"></script>  
+ 
+<footer class="bgt-footer">
+    <p>Backlink Generator Tool — free, client-side SEO utility.</p>
+    <p>Enhanced by <a href="https://f9xr.org" target="_blank" rel="noopener">F9XR Team</a> · <a href="../index.html">Open the main tool</a></p>
+  </footer></body>
 </html>

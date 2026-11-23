@@ -1,1140 +1,1032 @@
-// backlink-generator.js (final v6.1)
-// - Fix: popup/tab with "Reuse same window/tab" now truly reuses the same window in ARCHIVE_TLDS variant runner
-// - Generalized archive.* per-URL variant logic (stop after first success)
-// - Robust Stop (runToken guards, timers cleared, close popups/iframes), strict timeout handling
-// - Blogger-safe ENCODE handling, CORS Ping first-success, 'Welcome to nginx' detection for archive.*
+// backlink-generator.js — v7.2
+// Client-side backlink / index-booster engine. No dependencies, no backend.
+//
+// v7.2: placeholder filling is explicit: a bare [URL] / {{URL}} is inserted
+// as written, and [ENCODE_URL] is used in query values. The four templates that
+// relied on guessing were rewritten to say so, so the position-sniffing regex
+// is gone. Wayback submission no longer rides along in the YouTube template
+// list; only the disclosed checkbox sends a URL to web.archive.org.
+//
+// v7.1: removed the archive-mirror expansion path (it duplicated all four
+// delivery modes); archive templates now run like any other task.
+//
+// v7.0 changes:
+// - Removed the commented-out spawnWaybackSaver block that threw a ReferenceError on every page load.
+// - URL handling no longer decodes (corrupts) valid URLs and no longer rewrites www. targets.
+// - Share links use ?u=<encoded>.
+// - Public-suffix aware host parsing (DOMAINNAME / TLD / SECOND_LEVEL_DOMAIN).
+// - Results are built with DOM APIs instead of innerHTML (template data is untrusted input).
+// - Templates load from the script's own folder, so demo pages, custom domains and file:// work.
+// - Wayback submission is opt-in and disclosed instead of firing on every run.
+// - Loaded/failed counts, optional batch limit, no log wipe on rerun.
 
-let backlinkTemplates = ['https://www.facebook.com/sharer/sharer.php?u=[ENCODE_URL]', 'https://twitter.com/intent/tweet?url=[ENCODE_URL]&text=[ENCODE_TITLE]'],
-    youtubeBacklinkTemplates = ['https://video.ultra-zone.net/watch.en.html.gz?v=[ID]', 'https://video.ultra-zone.net/watch.en.html.gz?v={{ID}}'],
-    corsProxiesTemplates = ['https://api.allorigins.win/raw?url=[ENCODE_URL]'];
+'use strict';
 
-const ARCHIVE_TLDS = ["archive.today", "archive.li", "archive.vn", "archive.fo", "archive.md", "archive.ph", "archive.is"];
+/* ------------------------------------------------------------------ *
+ * Fallback data (used only when the JSON files cannot be fetched)
+ * ------------------------------------------------------------------ */
+let backlinkTemplates = [
+  'https://www.facebook.com/sharer/sharer.php?u=[ENCODE_URL]',
+  'https://twitter.com/intent/tweet?url=[ENCODE_URL]&text=[ENCODE_TITLE]'
+];
+let youtubeBacklinkTemplates = [
+  'https://video.ultra-zone.net/watch.en.html.gz?v=[ID]'
+];
+let corsProxiesTemplates = [
+  'https://api.allorigins.win/raw?url=[ENCODE_URL]'
+];
 
-// Run control for Stop
+const TASK_TIMEOUT = 8000;
+const PING_TIMEOUT = 5000;
+const RERUN_DELAY = 2000;
+const WAYBACK_TEMPLATE = 'https://web.archive.org/save/[URL]';
+
+// Two-label public suffixes we can handle offline. Longest match wins.
+const MULTI_PART_SUFFIXES = new Set([
+  'co.uk', 'org.uk', 'me.uk', 'ac.uk', 'gov.uk', 'net.uk', 'sch.uk', 'ltd.uk', 'plc.uk',
+  'com.au', 'net.au', 'org.au', 'edu.au', 'gov.au', 'id.au', 'asn.au',
+  'co.nz', 'net.nz', 'org.nz', 'govt.nz', 'ac.nz',
+  'co.jp', 'ne.jp', 'or.jp', 'ac.jp', 'go.jp',
+  'co.in', 'net.in', 'org.in', 'gen.in', 'firm.in', 'ind.in', 'ac.in', 'gov.in',
+  'co.za', 'org.za', 'net.za', 'gov.za', 'ac.za',
+  'co.il', 'org.il', 'net.il', 'ac.il', 'gov.il',
+  'co.kr', 'or.kr', 'ne.kr', 'go.kr',
+  'co.id', 'or.id', 'web.id', 'ac.id', 'go.id',
+  'com.br', 'net.br', 'org.br', 'gov.br', 'edu.br',
+  'com.mx', 'org.mx', 'gob.mx', 'com.ar', 'com.tr', 'com.cn', 'net.cn', 'org.cn',
+  'com.hk', 'com.sg', 'com.tw', 'com.my', 'com.ph', 'com.vn', 'com.pk', 'com.eg',
+  'com.sa', 'com.ua', 'com.ng', 'com.pl', 'com.es', 'com.pt', 'com.ru',
+  'co.ke', 'co.ug', 'co.tz', 'co.zw', 'co.th', 'co.ma',
+  'edu.cn', 'edu.sg', 'ac.ir', 'co.ir'
+]);
+
+/* ------------------------------------------------------------------ *
+ * Run state
+ * ------------------------------------------------------------------ */
 let runToken = 0;
 let rerunTimer = null;
 const activeIframes = new Set();
 const activeWindows = new Set();
 
+let running = false;
+let queue = [];
+let slots = [];
+let totalTasks = 0;
+let doneCount = 0;
+let okCount = 0;
+let failCount = 0;
+let activeRunUrls = [];
+let currentTarget = '';
+
+/* ------------------------------------------------------------------ *
+ * Small helpers
+ * ------------------------------------------------------------------ */
+function el(id) {
+  return document.getElementById(id);
+}
+
+// Base folder of this script file. Makes ./data.json work from /, /demo/ and file://.
+const SCRIPT_BASE = (function () {
+  try {
+    const cs = document.currentScript;
+    if (cs && cs.src) return new URL('.', cs.src).href;
+  } catch (e) { /* ignore */ }
+  try {
+    return new URL('./', location.href).href;
+  } catch (e) {
+    return './';
+  }
+})();
+
+function showNotice(message, kind) {
+  let box = el('toolStatus');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'toolStatus';
+    const anchor = el('controls');
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(box, anchor.nextSibling);
+    else document.body.appendChild(box);
+  }
+  box.textContent = message;
+  box.className = 'tool-status' + (kind ? ' ' + kind : '');
+  box.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+  box.hidden = !message;
+}
+
+function clearNotice() {
+  const box = el('toolStatus');
+  if (box) {
+    box.textContent = '';
+    box.hidden = true;
+  }
+}
+
+function isSafeHttpUrl(value) {
+  try {
+    const u = new URL(String(value), location.href);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch (e) {
+    return false;
+  }
+}
+
+function shuffleInPlace(list) {
+  for (let i = list.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [list[i], list[j]] = [list[j], list[i]];
+  }
+  return list;
+}
+
+function videoIdOf(url) {
+  try {
+    return new URL(url).searchParams.get('v');
+  } catch (e) {
+    return null;
+  }
+}
+
+function templatesFor(vid) {
+  return (vid ? youtubeBacklinkTemplates : backlinkTemplates).slice();
+}
+
+/* ------------------------------------------------------------------ *
+ * Template loading
+ * ------------------------------------------------------------------ */
 async function loadTemplates() {
+  const files = [
+    ['backlink-templates.json', 'backlinks'],
+    ['youtube-backlink-templates.json', 'youtube'],
+    ['cors-proxies.json', 'proxies']
+  ];
+  const failed = [];
+
+  await Promise.all(files.map(async ([file, kind]) => {
     try {
-        const [r1, r2, r3] = await Promise.all([
-            fetch('https://backlink-generator-tool.github.io/backlink-generator-tool/backlink-templates.json'),
-            fetch('https://backlink-generator-tool.github.io/backlink-generator-tool/youtube-backlink-templates.json'),
-            fetch('https://backlink-generator-tool.github.io/backlink-generator-tool/cors-proxies.json')
-        ]);
-        if (r1.ok) backlinkTemplates = await r1.json();
-        if (r2.ok) youtubeBacklinkTemplates = await r2.json();
-        if (r3.ok) corsProxiesTemplates = await r3.json();
+      const res = await fetch(new URL(file, SCRIPT_BASE), { cache: 'no-cache' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) throw new Error('empty data');
+      const clean = Array.from(new Set(
+        data.filter(item => typeof item === 'string' && item.trim())
+      ));
+      if (!clean.length) throw new Error('no usable entries');
+      if (kind === 'backlinks') backlinkTemplates = clean;
+      else if (kind === 'youtube') youtubeBacklinkTemplates = clean;
+      else corsProxiesTemplates = clean;
     } catch (e) {
-        console.warn('Failed to load remote templates:', e);
+      failed.push(file);
     }
+  }));
+
+  if (failed.length) {
+    showNotice(
+      'Some template lists could not be loaded (' + failed.join(', ') + '). ' +
+      'Using built-in fallback templates for those lists.',
+      'warn'
+    );
+  }
+  return failed;
+}
+
+/* ------------------------------------------------------------------ *
+ * URL normalisation
+ * ------------------------------------------------------------------ */
+function isHostnameLikelyValid(hostname) {
+  if (!hostname) return false;
+  hostname = hostname.toLowerCase();
+
+  if (hostname === 'localhost') return true;
+
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) {
+    return hostname.split('.').every(n => {
+      const v = parseInt(n, 10);
+      return v >= 0 && v <= 255;
+    });
+  }
+
+  // IPv6 literal (URL() has already validated/normalised it)
+  if (hostname.includes(':')) return true;
+
+  if (hostname.indexOf('.') === -1) return false;
+
+  const tld = hostname.split('.').pop();
+  return /^[a-z]{2,63}$/i.test(tld);
 }
 
 /**
- * Try to extract a normalized URL from a query-param value.
- * Accepts a plain URL or a percent-encoded URL (e.g. https%3A%2F%2Fexample.com).
- * Returns the normalized URL string (as returned by normalizeUrl) or null.
+ * Normalise user input into a canonical http(s) URL.
+ * A value that is already a parseable URL is never percent-decoded: decoding
+ * turns %2F into a path separator and %26 into an extra query parameter.
  */
-function getNormalizedUrlFromParam(param) {
-    if (!param) return null;
-    let candidate = param.trim();
-
-    // If it appears to be wrapped in a leading "?" (unlikely here) strip
-    if (candidate.startsWith('?')) candidate = candidate.slice(1);
-
-    // Try decodeURIComponent safely — if it throws, ignore and use raw
-    try {
-        const decoded = decodeURIComponent(candidate);
-        // prefer decoded if it's different (and not empty)
-        if (decoded && decoded !== candidate) candidate = decoded;
-    } catch (e) {
-        // malformed percent-encoding -> keep candidate as-is
-    }
-
-    // Use existing normalizeUrl() to validate/normalize
-    const norm = normalizeUrl(candidate);
-    return norm || null;
-}
-
-
-// Add this helper above normalizeUrl()
-function isHostnameLikelyValid(hostname) {
-    if (!hostname) return false;
-    hostname = hostname.toLowerCase();
-
-    // allow localhost
-    if (hostname === 'localhost') return true;
-
-    // allow IPv4 like 127.0.0.1
-    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) {
-        // basic numeric range check (0-255) for each octet
-        const parts = hostname.split('.').map(n => parseInt(n, 10));
-        if (parts.every(n => n >= 0 && n <= 255)) return true;
-        return false;
-    }
-
-    // allow IPv6 (very permissive check; URL() already normalized but we include this)
-    if (hostname.includes(':')) return true;
-
-    // Hostname must contain a dot (e.g. example.com). If not, reject.
-    if (hostname.indexOf('.') === -1) return false;
-
-    // check TLD looks reasonable: alpha, length 2..63 (covers most real TLDs incl. new gTLDs)
-    const tld = hostname.split('.').pop();
-    if (!/^[a-z]{2,63}$/i.test(tld)) return false;
-
-    // domain looks OK
-    return true;
-}
-
-// Replace your current normalizeUrl with this improved version
 function normalizeUrl(raw) {
+  if (typeof raw !== 'string') return null;
+  let ustr = raw.trim();
+  if (!ustr) return null;
+
+  if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(ustr)) {
+    // Not a URL yet: it may be a percent-encoded URL (https%3A%2F%2Fexample.com).
     try {
-        if (!raw || !raw.trim()) return null;
+      const decoded = decodeURIComponent(ustr);
+      if (decoded && decoded !== ustr) ustr = decoded;
+    } catch (e) { /* malformed encoding: keep as typed */ }
+    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(ustr)) ustr = 'https://' + ustr;
+  }
 
-        // If passed an encoded value (rare here), try a safe decode first
-        let ustr = raw.trim();
-        try {
-            const dec = decodeURIComponent(ustr);
-            if (dec && dec !== ustr) ustr = dec;
-        } catch (e) {
-            // ignore bad percent-encoding and continue with raw
-        }
+  let p;
+  try {
+    p = new URL(ustr);
+  } catch (e) {
+    return null;
+  }
 
-        // If no scheme, prepend https:// to use URL parsing, but keep original intent
-        if (!/^[a-zA-Z][a-zA-Z0-9+\-.]*:\/\//.test(ustr)) {
-            ustr = 'https://' + ustr;
-        }
+  if (p.protocol !== 'http:' && p.protocol !== 'https:') return null;
+  if (!isHostnameLikelyValid(p.hostname)) return null;
+  if (p.username || p.password) return null;
 
-        const p = new URL(ustr);
-
-        // Reject obviously-bad hostnames like single-word "halloworld"
-        if (!isHostnameLikelyValid(p.hostname)) return null;
-
-        // Normalize: strip leading www., remove trailing slash if no path
-        p.hostname = p.hostname.replace(/^www\./i, '');
-
-        if (!p.pathname || p.pathname === '/') p.pathname = '';
-        return p.toString();
-    } catch (err) {
-        return null;
-    }
+  // Keep the hostname exactly as typed (www. is meaningful), keep path/query/hash.
+  let out = p.toString();
+  if (p.pathname === '/' && !p.search && !p.hash) out = out.replace(/\/$/, '');
+  return out;
 }
 
+function isValidURL(value) {
+  return !!normalizeUrl(value);
+}
+
+/**
+ * Read the target out of the query string. Supports ?u=<encoded> (current)
+ * and the legacy ?<raw url> form.
+ */
+function getUrlFromQuery(search) {
+  if (!search || search === '?') return '';
+  let params;
+  try {
+    params = new URLSearchParams(search);
+  } catch (e) {
+    return '';
+  }
+  const direct = params.get('u') || params.get('url');
+  if (direct) {
+    const norm = normalizeUrl(direct);
+    if (norm) return norm;
+  }
+  const legacy = search.replace(/^\?/, '').split('&')[0];
+  if (legacy && legacy !== direct) {
+    const norm = normalizeUrl(legacy);
+    if (norm) return norm;
+  }
+  return '';
+}
+
+function buildShareUrl(norm) {
+  const base = (location.protocol === 'http:' || location.protocol === 'https:')
+    ? location.origin + location.pathname
+    : location.href.split('?')[0].split('#')[0];
+  return base + '?u=' + encodeURIComponent(norm);
+}
+
+/* ------------------------------------------------------------------ *
+ * Placeholder map
+ * ------------------------------------------------------------------ */
+function domainParts(hostname) {
+  const host = String(hostname || '').toLowerCase();
+  if (!host) return { subdomain: '', domainname: '', tld: '', second: '' };
+
+  const isIp = /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(':') || host.startsWith('[');
+  if (isIp || host.indexOf('.') === -1) {
+    return { subdomain: '', domainname: host, tld: '', second: host };
+  }
+
+  const parts = host.split('.');
+  let suffixLen = 1;
+  if (parts.length >= 3 && MULTI_PART_SUFFIXES.has(parts.slice(-2).join('.'))) suffixLen = 2;
+
+  const tld = parts.slice(-suffixLen).join('.');
+  const sldIndex = parts.length - suffixLen - 1;
+  const domainname = sldIndex >= 0 ? parts[sldIndex] : '';
+  const subdomain = sldIndex > 0 ? parts.slice(0, sldIndex).join('.') + '.' : '';
+
+  return {
+    subdomain: subdomain,
+    domainname: domainname,
+    tld: tld,
+    second: domainname ? domainname + '.' + tld : host
+  };
+}
 
 function buildMap(url, vid) {
-    const p = new URL(url);
-    const parts = p.hostname.split('.');
-    const ln = parts.length;
+  const p = new URL(url);
+  const d = domainParts(p.hostname);
+  const hostnameNoWWW = p.hostname.replace(/^www\./i, '');
 
-    /**
-     * buildMap creates a dictionary of reusable placeholders for template replacement.
-     *
-     * Example for URL: https://www.example.co.uk/path/page?x=1#section
-     * -------------------------------------------------------------
-     * PROTOCOL         → "https:"
-     * SUBDOMAIN        → "www."
-     * DOMAINNAME       → "example"
-     * TLD              → "co.uk"
-     * HOST             → "www.example.co.uk"
-     * PORT             → "" or ":8080" if defined
-     * PATH             → "/path/page"
-     * QUERY            → "?x=1"
-     * PARAMS           → "x=1"
-     * FRAGMENT         → "#section"
-     * URL              → "https://www.example.co.uk/path/page?x=1#section"
-     * DOMAIN           → "www.example.co.uk"
-     * NOPROTOCOL_URL   → "www.example.co.uk/path/page?x=1#section"
-     * NOSUBDOMAIN_URL  → "example.co.uk/path/page?x=1#section"
-     * ID               → YouTube video ID if extracted externally
-     */
+  const map = {
+    PROTOCOL: p.protocol,
+    SUBDOMAIN: d.subdomain,
+    DOMAINNAME: d.domainname,
+    TLD: d.tld,
+    SECOND_LEVEL_DOMAIN: d.second,
+    HOST: p.hostname,
+    PORT: p.port ? ':' + p.port : '',
+    PATH: p.pathname,
+    QUERY: p.search,
+    PARAMS: p.search ? p.search.slice(1) : '',
+    FRAGMENT: p.hash,
+    URL: url,
+    DOMAIN: p.hostname,
+    NOPROTOCOL_URL: p.hostname + p.pathname + p.search + p.hash,
+    NOSUBDOMAIN_URL: hostnameNoWWW + p.pathname + p.search + p.hash
+  };
+  if (vid) map.ID = vid;
 
-    const hostnameNoWWW = p.hostname.replace(/^www\./i, '');
-    let map = {
-        PROTOCOL: p.protocol,
-        SUBDOMAIN: ln > 2 ? parts.slice(0, ln - 2).join('.') + '.' : '',
-        DOMAINNAME: parts[ln - 2] || '',
-        TLD: parts[ln - 1] || '',
-        HOST: p.hostname,
-        PORT: p.port ? ':' + p.port : '',
-        PATH: p.pathname,
-        QUERY: p.search,
-        PARAMS: p.search ? p.search.slice(1) : '',
-        FRAGMENT: p.hash,
-        URL: url,
-        DOMAIN: p.hostname,
-        NOPROTOCOL_URL: `${p.hostname}${p.pathname}${p.search}${p.hash}`,
-        NOSUBDOMAIN_URL: `${hostnameNoWWW}${p.pathname}${p.search}${p.hash}`
-    };
-    if (vid) map.ID = vid;
+  Object.keys(map).forEach(key => {
+    let encoded = '';
+    try {
+      encoded = encodeURIComponent(map[key]);
+    } catch (e) {
+      encoded = '';
+    }
+    map['ENCODE_' + key] = encoded;
+  });
 
-    Object.keys(map).forEach(k => {
-        try {
-            map['ENCODE_' + k] = encodeURIComponent(map[k]);
-        } catch {
-            map['ENCODE_' + k] = '';
-        }
-    });
-    return map;
+  return map;
 }
 
+// A placeholder is inserted as written: [URL] is raw, [ENCODE_URL] is encoded.
+// Templates declare which they want, so nothing here has to guess.
 function replacePlaceholders(tpl, map) {
-    return tpl.replace(/(\{\{|\[)\s*(ENCODE_)?([A-Z0-9_]+)\s*(\}\}|\])/gi,
-        (match, open, encPrefix, key, close, offset, fullStr) => {
-            if (!key) return '';
-            key = key.toUpperCase();
-            const wantsEncode = !!encPrefix;
-            if (wantsEncode) {
-                const encodedKey = 'ENCODE_' + key;
-                if (map.hasOwnProperty(encodedKey)) return map[encodedKey];
-                try {
-                    return encodeURIComponent(map[key] || '');
-                } catch {
-                    return '';
-                }
-            }
-            if (key === 'URL') {
-                const before = fullStr.slice(Math.max(0, offset - 30), offset).toLowerCase();
-                if (/\burl\s*=\s*$/.test(before) || /\burl\s*=\s*/i.test(fullStr)) {
-                    try {
-                        return encodeURIComponent(map['URL'] || '');
-                    } catch {
-                        return map['URL'] || '';
-                    }
-                }
-            }
-            return map[key] || '';
-        });
+  return tpl.replace(
+    /(\{\{|\[)\s*(ENCODE_)?([A-Z0-9_]+)\s*(\}\}|\])/gi,
+    function (match, open, encPrefix, key) {
+      if (!key) return '';
+      key = key.toUpperCase();
+      if (encPrefix) {
+        const encodedKey = 'ENCODE_' + key;
+        if (Object.prototype.hasOwnProperty.call(map, encodedKey)) return map[encodedKey];
+        try {
+          return encodeURIComponent(map[key] || '');
+        } catch (e) {
+          return '';
+        }
+      }
+      return map[key] || '';
+    }
+  );
 }
 
 function generateUrl(tpl, normUrl, vid) {
-    if (!tpl) return '';
-    tpl = tpl
-        .replace(/%5B\s*(ENCODE_)?([A-Z0-9_]+)\s*%5D/gi, '[$1$2]')
-        .replace(/&#(?:x5b|91);\s*(ENCODE_)?([A-Z0-9_]+)\s*&#(?:x5d|93);/gi, '[$1$2]')
-        .replace(/\{\{\s*(ENCODE_)?([A-Z0-9_]+)\s*\}\}/gi, '[$1$2]')
-        .replace(/%7B%7B\s*(ENCODE_)?([A-Z0-9_]+)\s*%7D%7D/gi, '[$1$2]');
-    const map = buildMap(normUrl, vid);
-    return replacePlaceholders(tpl, map);
+  if (!tpl) return '';
+  tpl = tpl
+    .replace(/%5B\s*(ENCODE_)?([A-Z0-9_]+)\s*%5D/gi, '[$1$2]')
+    .replace(/&#(?:x5b|91);\s*(ENCODE_)?([A-Z0-9_]+)\s*&#(?:x5d|93);/gi, '[$1$2]')
+    .replace(/\{\{\s*(ENCODE_)?([A-Z0-9_]+)\s*\}\}/gi, '[$1$2]')
+    .replace(/%7B%7B\s*(ENCODE_)?([A-Z0-9_]+)\s*%7D%7D/gi, '[$1$2]');
+  return replacePlaceholders(tpl, buildMap(normUrl, vid));
 }
 
-// === Generalized ARCHIVE_TLDS helpers ===
-function isArchiveHost(hostname) {
-    const h = (hostname || '').toLowerCase();
-    return ARCHIVE_TLDS.includes(h);
-}
-
-function buildArchiveUrlVariants(finalUrl) {
-    try {
-        const u = new URL(finalUrl);
-        if (!isArchiveHost(u.hostname)) return null;
-        return ARCHIVE_TLDS.map(tld => {
-            const v = new URL(finalUrl);
-            v.hostname = tld;
-            return v.toString();
-        });
-    } catch {
-        return null;
-    }
-}
-
-// Settings & UI wires
+/* ------------------------------------------------------------------ *
+ * Settings (cookie)
+ * ------------------------------------------------------------------ */
 function saveSettings() {
-    const s = {
-        mode: modeSelect.value,
-        reuse: reuseToggle.value,
-        conc: concurrencyRange.value,
-        rerun: rerunCheckbox.checked,
-        shuffle: shuffleCheckbox.checked
-    };
-    document.cookie = 'bg=' + encodeURIComponent(JSON.stringify(s)) + ';path=/;max-age=31536000';
+  const s = {
+    mode: el('modeSelect') ? el('modeSelect').value : 'iframe',
+    reuse: el('reuseToggle') ? el('reuseToggle').value : 'fresh',
+    conc: el('concurrencyRange') ? el('concurrencyRange').value : 5,
+    rerun: el('rerunCheckbox') ? el('rerunCheckbox').checked : false,
+    shuffle: el('shuffleCheckbox') ? el('shuffleCheckbox').checked : true,
+    wayback: el('waybackCheckbox') ? el('waybackCheckbox').checked : false,
+    limit: el('batchLimit') ? el('batchLimit').value : '0'
+  };
+  let cookie = 'bg=' + encodeURIComponent(JSON.stringify(s)) + ';path=/;max-age=31536000;SameSite=Lax';
+  if (location.protocol === 'https:') cookie += ';Secure';
+  document.cookie = cookie;
 }
 
 function loadSettings() {
-    const c = document.cookie.split(';').map(x => x.trim()).find(x => x.startsWith('bg='));
-    if (c) try {
-        const s = JSON.parse(decodeURIComponent(c.slice(3)));
-        modeSelect.value = s.mode || 'iframe';
-        reuseToggle.value = s.reuse || 'fresh';
-        concurrencyRange.value = s.conc || 5;
-        rerunCheckbox.checked = s.rerun !== false;
-        shuffleCheckbox.checked = s.shuffle !== false;
-        concurrentCount.textContent = concurrencyRange.value;
-        return;
-    } catch {}
-    modeSelect.value = 'iframe';
-    reuseToggle.value = 'fresh';
-    concurrencyRange.value = 5;
-    rerunCheckbox.checked = false;
-    shuffleCheckbox.checked = true;
-    concurrentCount.textContent = 5;
-    saveSettings();
+  const modeSelect = el('modeSelect');
+  const reuseToggle = el('reuseToggle');
+  const concurrencyRange = el('concurrencyRange');
+  const rerunCheckbox = el('rerunCheckbox');
+  const shuffleCheckbox = el('shuffleCheckbox');
+  const waybackCheckbox = el('waybackCheckbox');
+  const batchLimit = el('batchLimit');
+  const concurrentCount = el('concurrentCount');
+
+  const raw = document.cookie.split(';').map(x => x.trim()).find(x => x.startsWith('bg='));
+  let saved = null;
+  if (raw) {
+    try {
+      saved = JSON.parse(decodeURIComponent(raw.slice(3)));
+    } catch (e) {
+      saved = null;
+    }
+  }
+
+  if (modeSelect) modeSelect.value = (saved && saved.mode) || 'iframe';
+  if (reuseToggle) reuseToggle.value = (saved && saved.reuse) || 'fresh';
+  if (concurrencyRange) concurrencyRange.value = String((saved && saved.conc) || 5);
+  if (rerunCheckbox) rerunCheckbox.checked = saved ? saved.rerun === true : false;
+  if (shuffleCheckbox) shuffleCheckbox.checked = saved ? saved.shuffle !== false : true;
+  if (waybackCheckbox) waybackCheckbox.checked = saved ? saved.wayback === true : false;
+  if (batchLimit) batchLimit.value = (saved && saved.limit) || '0';
+  if (concurrentCount && concurrencyRange) concurrentCount.textContent = concurrencyRange.value;
+
+  if (!saved) saveSettings();
 }
 
-const urlInput = document.getElementById('urlInput'),
-    startBtn = document.getElementById('startBtn'),
-    toggleAdv = document.getElementById('toggleAdvancedBtn'),
-    advPanel = document.getElementById('advancedPanel'),
-    modeSelect = document.getElementById('modeSelect'),
-    reuseToggle = document.getElementById('reuseToggle'),
-    concurrencyRange = document.getElementById('concurrencyRange'),
-    concurrentCount = document.getElementById('concurrentCount'),
-    rerunCheckbox = document.getElementById('rerunCheckbox'),
-    shuffleCheckbox = document.getElementById('shuffleCheckbox'),
-    newUrlInput = document.getElementById('newUrl'),
-    copyBtn = document.getElementById('copyBtn'),
-    downloadBtn = document.getElementById('downloadBtn'),
-    progressBar = document.getElementById('progressBar'),
-    progressText = document.getElementById('progressText'),
-    resultsUl = document.getElementById('results'),
-    externalLink = document.getElementById('externalLink');
-
+/* ------------------------------------------------------------------ *
+ * UI wiring
+ * ------------------------------------------------------------------ */
 function updateReuseToggleState() {
-    reuseToggle.disabled = !(modeSelect.value === 'popup' || modeSelect.value === 'tab');
+  const modeSelect = el('modeSelect');
+  const reuseToggle = el('reuseToggle');
+  if (!modeSelect || !reuseToggle) return;
+  reuseToggle.disabled = !(modeSelect.value === 'popup' || modeSelect.value === 'tab');
 }
-modeSelect.addEventListener('change', updateReuseToggleState);
 
-[modeSelect, reuseToggle, concurrencyRange, rerunCheckbox, shuffleCheckbox].forEach(el => el.addEventListener('change', saveSettings));
-concurrencyRange.addEventListener('input', () => {
-    concurrentCount.textContent = concurrencyRange.value;
-    saveSettings();
-});
-toggleAdv.addEventListener('click', () => {
-    advPanel.style.display = advPanel.style.display === 'none' ? 'block' : 'none';
-});
-startBtn.addEventListener('click', () => running ? stopRun() : startRun());
-copyBtn.addEventListener('click', () => {
-    newUrlInput.select();
-    document.execCommand('copy');
-});
+function setExternalLink(text, href) {
+  const link = el('externalLink');
+  if (!link) return;
+  if (!href) {
+    link.style.display = 'none';
+    return;
+  }
+  link.href = href;
+  link.style.display = 'inline-block';
+  let host = href;
+  try {
+    host = new URL(href).hostname;
+  } catch (e) { /* keep as-is */ }
+  link.textContent = '\uD83D\uDD17 ' + text + ' \u2192 ' + host;
+}
 
-let running = false,
-    queue = [],
-    slots = [],
-    totalTasks = 0,
-    doneCount = 0;
+/* ------------------------------------------------------------------ *
+ * Results list
+ * ------------------------------------------------------------------ */
+function appendResult(url) {
+  const resultsUl = el('results');
+  if (!resultsUl) return null;
+
+  const li = document.createElement('li');
+  const a = document.createElement('a');
+  a.textContent = url;
+  a.title = url;
+  if (isSafeHttpUrl(url)) {
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer nofollow';
+  }
+  const status = document.createElement('span');
+  status.className = 'status loading';
+  status.textContent = '\u23F3';
+  status.setAttribute('role', 'img');
+  status.setAttribute('aria-label', 'pending');
+
+  li.appendChild(a);
+  li.appendChild(status);
+  resultsUl.appendChild(li);
+  return status;
+}
+
+function markStatus(status, ok) {
+  if (!status) return;
+  status.textContent = ok ? '\u2714\uFE0F' : '\u2716\uFE0F';
+  status.className = 'status ' + (ok ? 'success' : 'failure');
+  status.setAttribute('aria-label', ok ? 'loaded' : 'did not load');
+  status.title = ok
+    ? 'The target page loaded (a load is not proof that a link was created).'
+    : 'The target did not load (timeout, block or popup blocked).';
+}
 
 function updateProgress() {
-    const pct = totalTasks ? Math.round(doneCount / totalTasks * 100) : 0;
-    progressBar.style.width = pct + '%';
-    progressText.textContent = `${doneCount}/${totalTasks} (${pct}%)`;
+  const bar = el('progressBar');
+  const text = el('progressText');
+  const pct = totalTasks ? Math.round((doneCount / totalTasks) * 100) : 0;
+  if (bar) bar.style.width = pct + '%';
+  if (text) {
+    text.textContent = doneCount + '/' + totalTasks + ' (' + pct + '%) \u00B7 \u2714 ' + okCount + ' \u00B7 \u2716 ' + failCount;
+  }
 }
 
-async function fetchWithTimeout(resource, timeout = 5000) {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-    try {
-        const res = await fetch(resource, {
-            signal: controller.signal
-        });
-        clearTimeout(id);
-        return res;
-    } catch (err) {
-        clearTimeout(id);
-        return {
-            ok: false,
-            __error: err
-        };
-    }
+/* ------------------------------------------------------------------ *
+ * Networking helpers
+ * ------------------------------------------------------------------ */
+async function fetchWithTimeout(resource, timeout) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout || PING_TIMEOUT);
+  try {
+    return await fetch(resource, { signal: controller.signal });
+  } catch (e) {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function isActive(slot) {
-    return running && slot && slot.token === runToken;
+  return running && slot && slot.token === runToken;
 }
 
-// Try a list of archive variant URLs, stop after first success (per-task)
-async function tryArchiveVariantUrls(slot, variantUrls, mode) {
-    for (let i = 0; i < variantUrls.length; i++) {
-        if (!isActive(slot)) return false;
-        const finalUrl = variantUrls[i];
-
-        const li = document.createElement('li');
-        li.innerHTML = `<a href="${finalUrl}" target="_blank" rel="noreferrer noopener">${finalUrl}</a> <span class="status loading">⏳</span>`;
-        resultsUl.appendChild(li);
-        const statusSpan = li.querySelector('.status');
-        const markThis = ok => {
-            if (!isActive(slot)) return;
-            statusSpan.innerHTML = ok ? '✔️' : '✖️';
-            statusSpan.className = 'status ' + (ok ? 'success' : 'failure');
-        };
-
-        if (mode === 'iframe') {
-            const ifr = document.createElement('iframe');
-            ifr.classList.add('hidden-iframe');
-            document.body.appendChild(ifr);
-            activeIframes.add(ifr);
-            let completed = false;
-            let resolver = null;
-            const cleanup = () => {
-                try {
-                    ifr.remove();
-                } catch (e) {}
-                activeIframes.delete(ifr);
-            };
-
-            ifr.onload = () => {
-                if (completed || !isActive(slot)) return;
-                try {
-                    const frameTitle = ifr.contentDocument ? ifr.contentDocument.title : '';
-                    if (frameTitle && frameTitle.trim().toLowerCase() === 'welcome to nginx') {
-                        completed = true;
-                        markThis(false);
-                        cleanup();
-                        if (resolver) resolver();
-                        return;
-                    }
-                } catch (e) {
-                    /* cross-origin; treat onload as success */ }
-                completed = true;
-                markThis(true);
-                cleanup();
-                if (resolver) resolver();
-            };
-
-            await new Promise(resolve => {
-                resolver = resolve;
-                try {
-                    ifr.src = finalUrl;
-                } catch (e) {}
-                slot.timeoutId = setTimeout(() => {
-                    if (!completed && isActive(slot)) {
-                        markThis(false);
-                        cleanup();
-                    }
-                    resolve();
-                }, 8000);
-            });
-
-            if (statusSpan.classList.contains('success')) return true;
-            continue;
-        }
-
-        if (mode === 'popup' || mode === 'tab') {
-            const specs = mode === 'popup' ? 'width=600,height=400' : '';
-            const reuse = (reuseToggle && reuseToggle.value === 'reuse');
-
-            if (reuse) {
-                // Reuse the same named window/tab per slot
-                if (!slot.ref || slot.ref.closed) {
-                    slot.ref = window.open('about:blank', 'slot-' + slot.id, specs);
-                    if (!slot.ref) {
-                        markThis(false);
-                        continue;
-                    }
-                    activeWindows.add(slot.ref);
-                }
-                let loaded = false;
-                try {
-                    slot.ref.onload = () => {
-                        loaded = true;
-                    };
-                } catch (eAssign) {}
-                try {
-                    slot.ref.location.href = finalUrl;
-                } catch (eSet) {}
-
-                await new Promise(resolve => {
-                    slot.timeoutId = setTimeout(() => {
-                        if (!isActive(slot)) return resolve();
-                        if (!loaded) {
-                            markThis(false);
-                            return resolve();
-                        }
-                        try {
-                            const t = slot.ref.document ? slot.ref.document.title : '';
-                            if (t && t.trim().toLowerCase() === 'welcome to nginx') {
-                                markThis(false);
-                            } else {
-                                markThis(true);
-                            }
-                        } catch (eDoc) {
-                            // Cross-origin but onload fired: success
-                            markThis(true);
-                        }
-                        resolve();
-                    }, 8000);
-                });
-
-                if (statusSpan.classList.contains('success')) return true;
-            } else {
-                // Fresh window per attempt, then close
-                try {
-                    const w = window.open('about:blank', '_blank', specs);
-                    if (!w) {
-                        markThis(false);
-                    } else {
-                        activeWindows.add(w);
-                        let loaded = false;
-                        try {
-                            w.onload = () => {
-                                loaded = true;
-                            };
-                        } catch (eAssign) {}
-                        try {
-                            w.location.href = finalUrl;
-                        } catch (eSet) {}
-
-                        await new Promise(resolve => {
-                            slot.timeoutId = setTimeout(() => {
-                                if (!isActive(slot)) {
-                                    try {
-                                        w.close();
-                                    } catch {}
-                                    activeWindows.delete(w);
-                                    return resolve();
-                                }
-                                if (!loaded) {
-                                    try {
-                                        w.close();
-                                    } catch {}
-                                    activeWindows.delete(w);
-                                    markThis(false);
-                                    return resolve();
-                                }
-                                try {
-                                    const t = w.document ? w.document.title : '';
-                                    if (t && t.trim().toLowerCase() === 'welcome to nginx') {
-                                        markThis(false);
-                                    } else {
-                                        markThis(true);
-                                    }
-                                    try {
-                                        w.close();
-                                    } catch {}
-                                } catch (eDoc) {
-                                    markThis(true);
-                                    try {
-                                        w.close();
-                                    } catch {}
-                                }
-                                activeWindows.delete(w);
-                                resolve();
-                            }, 8000);
-                        });
-
-                        if (statusSpan.classList.contains('success')) return true;
-                    }
-                } catch {
-                    markThis(false);
-                }
-            }
-            continue;
-        }
-
-        if (mode === 'ping') {
-            let ok = false;
-            for (const proxyTpl of corsProxiesTemplates) {
-                if (!isActive(slot)) return false;
-                try {
-                    const proxyUrl = generateUrl(proxyTpl, finalUrl);
-                    if (!proxyUrl) continue;
-                    try {
-                        const res = await fetchWithTimeout(proxyUrl, 5000);
-                        if (res && res.ok) {
-                            ok = true;
-                            break;
-                        }
-                    } catch {}
-                } catch {}
-            }
-            markThis(ok);
-            if (ok) return true;
-            continue;
-        }
-
-        // Fallback direct fetch
-        try {
-            const res = await fetchWithTimeout(finalUrl, 5000);
-            const ok = !!(res && res.ok);
-            markThis(ok);
-            if (ok) return true;
-        } catch {
-            markThis(false);
-        }
-    }
-    return false;
+function closeWindow(w) {
+  try {
+    w.close();
+  } catch (e) { /* ignore */ }
+  activeWindows.delete(w);
 }
 
-async function launchSlot(slot) {
-    if (!isActive(slot)) return;
-    const task = queue.shift();
-    if (!task) {
-        if (slots.every(s => !s.busy)) finishRun();
-        return;
-    }
-    slot.busy = true;
+function destroyIframe(ifr) {
+  try {
+    ifr.remove();
+  } catch (e) { /* ignore */ }
+  activeIframes.delete(ifr);
+}
 
-    // Archive variant group task
-    if (task.archiveVariants && task.archiveVariants.length) {
-        try {
-            await tryArchiveVariantUrls(slot, task.archiveVariants, task.mode);
-        } catch {}
-        if (!isActive(slot)) return;
-        doneCount++;
-        updateProgress();
-        slot.busy = false;
-        if (isActive(slot)) launchSlot(slot);
-        return;
-    }
+/* ------------------------------------------------------------------ *
+ * Delivery modes
+ * ------------------------------------------------------------------ */
+function runTask(slot, task) {
+  return new Promise(resolve => {
+    const statusSpan = appendResult(task.url);
+    let settled = false;
 
-    // Normal task
-    const {
-        mode,
-        url
-    } = task;
-    const li = document.createElement('li');
-    li.innerHTML = `<a href="${url}" target="_blank" rel="noreferrer noopener">${url}</a><span class="status loading">⏳</span>`;
-    resultsUl.appendChild(li);
-    const mark = ok => {
-        if (!isActive(slot)) return;
-        clearTimeout(slot.timeoutId);
-        slot.busy = false;
-        doneCount++;
-        const span = li.querySelector('.status');
-        span.innerHTML = ok ? '✔️' : '✖️';
-        span.className = 'status ' + (ok ? 'success' : 'failure');
+    const finish = ok => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(slot.timeoutId);
+      slot.timeoutId = null;
+      if (isActive(slot)) {
+        markStatus(statusSpan, ok);
+        if (ok) okCount += 1;
+        else failCount += 1;
+        doneCount += 1;
         updateProgress();
-        if (isActive(slot)) launchSlot(slot);
+      }
+      resolve();
     };
 
-    if (mode === 'iframe') {
-        const ifr = document.createElement('iframe');
-        ifr.classList.add('hidden-iframe');
-        document.body.appendChild(ifr);
-        activeIframes.add(ifr);
-        const cleanup = () => {
-            try {
-                ifr.remove();
-            } catch (e) {}
-            activeIframes.delete(ifr);
-        };
-        ifr.onload = () => {
-            if (isActive(slot)) {
-                clearTimeout(slot.timeoutId);
-                cleanup();
-                mark(true);
-            } else {
-                cleanup();
-            }
-        };
-        slot.timeoutId = setTimeout(() => {
-            cleanup();
-            mark(false);
-        }, 8000);
-        ifr.src = url;
-        return;
-    } else if (mode === 'popup' || mode === 'tab') {
-        const specs = mode === 'popup' ? 'width=600,height=400' : '';
-        if (reuseToggle.value === 'fresh') {
-            const w = window.open('about:blank', '_blank', specs);
-            if (!w) {
-                alert('Pop-up blocked!');
-                mark(false);
-                return;
-            }
-            activeWindows.add(w);
-            w.location.href = url;
-            slot.timeoutId = setTimeout(() => {
-                try {
-                    w.close();
-                } catch (e) {}
-                activeWindows.delete(w);
-                mark(true);
-            }, 8000);
-        } else {
-            if (!slot.ref || slot.ref.closed) {
-                slot.ref = window.open('about:blank', 'slot-' + slot.id, specs);
-                if (!slot.ref) {
-                    alert('Pop-up blocked!');
-                    mark(false);
-                    return;
-                }
-            }
-            activeWindows.add(slot.ref);
-            slot.ref.location.href = url;
-            slot.timeoutId = setTimeout(() => {
-                activeWindows.delete(slot.ref);
-                mark(true);
-            }, 8000);
-        }
+    if (task.mode === 'iframe') {
+      const ifr = document.createElement('iframe');
+      ifr.className = 'hidden-iframe';
+      ifr.setAttribute('tabindex', '-1');
+      ifr.setAttribute('aria-hidden', 'true');
+      ifr.setAttribute('title', 'Backlink target');
+      document.body.appendChild(ifr);
+      activeIframes.add(ifr);
 
-    } else if (mode === 'ping') {
-        const PROXY_TIMEOUT = 5000;
-        let ok = false;
-        for (const tpl of corsProxiesTemplates) {
-            if (!isActive(slot)) return;
-            try {
-                const proxyUrl = generateUrl(tpl, url);
-                if (!proxyUrl) continue;
-                try {
-                    const res = await fetchWithTimeout(proxyUrl, PROXY_TIMEOUT);
-                    if (res && res.ok) {
-                        ok = true;
-                        break;
-                    }
-                } catch {}
-            } catch {}
-        }
-        mark(ok);
-    } else {
-        try {
-            const res = await fetchWithTimeout(url, 5000);
-            mark(res && res.ok);
-        } catch (e) {
-            mark(false);
-        }
-    }
-}
+      ifr.onload = () => {
+        destroyIframe(ifr);
+        finish(true);
+      };
+      ifr.onerror = () => {
+        destroyIframe(ifr);
+        finish(false);
+      };
+      slot.timeoutId = setTimeout(() => {
+        destroyIframe(ifr);
+        finish(false);
+      }, TASK_TIMEOUT);
 
-// small URL validator (safe, uses URL constructor)
-function isValidURL(u) {
-  try {
-    if (!u || typeof u !== 'string') return false;
-    // allow encoded forms too: decode safely
-    let cand = u.trim();
-    try {
-      const dec = decodeURIComponent(cand);
-      if (dec && dec !== cand) cand = dec;
-    } catch (e) { /* ignore */ }
-    // ensure we have a scheme for URL parsing
-    if (!/^[a-zA-Z][a-zA-Z0-9+\-.]*:\/\//.test(cand)) cand = 'https://' + cand;
-    new URL(cand);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-/**
- * Submits a hidden form (POST) to web.archive.org/save/ using the supplied iframe as target.
- * If iframe is not attached yet, it will still work since we ensure attachment before submit.
- *
- * @param {HTMLIFrameElement} iframe - existing iframe element (will be given a name if missing)
- * @param {string} [targetUrl] - url to archive (defaults to window.location.href)
- */
-function submitToWaybackInFrame(iframe, targetUrl) {
-  try {
-    targetUrl = (typeof targetUrl === 'string' && targetUrl.trim()) ? targetUrl.trim() : window.location.href;
-
-    if (!isValidURL(targetUrl)) {
-      console.warn('submitToWaybackInFrame: invalid target URL:', targetUrl);
+      try {
+        ifr.src = task.url;
+      } catch (e) {
+        destroyIframe(ifr);
+        finish(false);
+      }
       return;
     }
 
-    // Ensure iframe has a name (used as form.target)
-    if (!iframe.name) {
-      iframe.name = 'bg-wayback-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
-    }
+    if (task.mode === 'popup' || task.mode === 'tab') {
+      const specs = task.mode === 'popup' ? 'width=600,height=400' : '';
+      const reuse = el('reuseToggle') && el('reuseToggle').value === 'reuse';
+      let w;
 
-    // Ensure iframe is attached to the DOM before submit (some browsers require this)
-    if (!document.body.contains(iframe)) {
-      document.body.appendChild(iframe);
-    }
+      if (reuse) {
+        if (!slot.ref || slot.ref.closed) {
+          slot.ref = window.open('about:blank', 'slot-' + slot.id, specs);
+        }
+        w = slot.ref;
+      } else {
+        w = window.open('about:blank', '_blank', specs);
+      }
 
-    // Build hidden form and submit to Wayback Save endpoint
-    const form = document.createElement('form');
-    form.style.display = 'none';
-    form.method = 'POST';
-    form.action = 'https://web.archive.org/save/';
-    form.target = iframe.name;
-    form.className = 'web-save-form';
+      if (!w) {
+        showNotice('Pop-ups are blocked. Allow pop-ups for this site, or switch to IFrame / Ping mode.', 'warn');
+        finish(false);
+        return;
+      }
 
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'url';
-    input.value = targetUrl;
-    form.appendChild(input);
-
-    // Attach, submit, then clean-up the form quickly (we keep iframe for TTL)
-    document.body.appendChild(form);
-
-    console.log('Wayback: submitting POST to /save/ for', targetUrl, 'target iframe:', iframe.name);
-    try {
-      form.submit();
-    } catch (eSubmit) {
-      // Some browsers restrict programmatic submit in rare contexts; try dispatching a submit event as fallback
+      activeWindows.add(w);
+      let loaded = false;
       try {
-        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-      } catch (eEvent) {}
+        w.onload = () => { loaded = true; };
+      } catch (e) { /* ignore */ }
+      try {
+        w.location.href = task.url;
+      } catch (e) { /* ignore */ }
+
+      slot.timeoutId = setTimeout(() => {
+        if (!reuse) closeWindow(w);
+        finish(loaded);
+      }, TASK_TIMEOUT);
+      return;
     }
 
-    // Remove the form after a short delay
-    setTimeout(() => {
-      try { form.remove(); } catch (e) {}
-    }, 1000);
-  } catch (err) {
-    console.error('submitToWaybackInFrame error:', err);
+    if (task.mode === 'ping') {
+      (async () => {
+        for (const proxyTpl of corsProxiesTemplates) {
+          if (!isActive(slot)) return finish(false);
+          try {
+            const proxyUrl = generateUrl(proxyTpl, task.url);
+            if (!proxyUrl) continue;
+            const res = await fetchWithTimeout(proxyUrl, PING_TIMEOUT);
+            if (res && res.ok) return finish(true);
+          } catch (e) { /* try next proxy */ }
+        }
+        finish(false);
+      })();
+      return;
+    }
+
+    finish(false);
+  });
+}
+
+async function launchSlot(slot) {
+  if (!isActive(slot)) return;
+  const task = queue.shift();
+  if (!task) {
+    if (slots.every(s => !s.busy)) finishRun();
+    return;
+  }
+
+  slot.busy = true;
+  try {
+    await runTask(slot, task);
+  } catch (e) {
+    /* a single template must never kill the run */
+  } finally {
+    slot.busy = false;
+    if (isActive(slot)) launchSlot(slot);
+    else if (running && slots.every(s => !s.busy)) finishRun();
   }
 }
 
-/**
- * Create a tiny, invisible iframe, submit a Wayback save request into it,
- * and auto-remove iframe after TTL. If background method appears to fail (no network request),
- * optionally fallback to opening a small tab (may be blocked by popup blocker).
- */
-function archiveCurrentPageBackground(opts = {}) {
+/* ------------------------------------------------------------------ *
+ * Optional, disclosed Wayback submission
+ * ------------------------------------------------------------------ */
+function archiveTargetUrl(targetUrl) {
+  if (!isSafeHttpUrl(targetUrl)) return false;
   try {
-    const ttl = (typeof opts.ttl === 'number') ? opts.ttl : 180000; // default 3 minutes
-    const targetUrl = (typeof opts.url === 'string' && opts.url.trim()) ? opts.url.trim() : window.location.href;
-
-    if (!isValidURL(targetUrl)) {
-      console.warn('archiveCurrentPageBackground: invalid URL, skipping:', targetUrl);
-      return false;
-    }
-
-    // Create the iframe and make it minimally visible but effectively hidden.
-    const iframe = document.createElement('iframe');
-    iframe.title = 'Archive current page';
-    iframe.referrerPolicy = 'no-referrer-when-downgrade';
-    iframe.className = 'hidden-iframe';
-
-    // Use inline styles so CSS won't accidentally hide it (we keep it tiny and non-interactive)
-    Object.assign(iframe.style, {
-      position: 'fixed',
-      left: '0',
-      bottom: '0',
-      width: '1px',
-      height: '1px',
-      border: '0',
-      padding: '0',
-      margin: '0',
-      opacity: '0',
-      pointerEvents: 'none',
-      zIndex: '-999999'
-    });
-
-    // Ensure iframe has a stable name before we build the form target
-    iframe.name = 'bg-wayback-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
-
-    // Append iframe then submit
-    document.body.appendChild(iframe);
-
-    // small delay before submit to ensure DOM attach
-    setTimeout(() => submitToWaybackInFrame(iframe, targetUrl), 200);
-
-    // cleanup after TTL
-    const ttlTimer = setTimeout(() => {
-      try { iframe.remove(); } catch (e) {}
-      clearTimeout(ttlTimer);
-    }, ttl);
-
-    console.info('archiveCurrentPageBackground: attempted background save for', targetUrl, 'iframe name:', iframe.name);
+    const ifr = document.createElement('iframe');
+    ifr.className = 'hidden-iframe';
+    ifr.setAttribute('title', 'Wayback Machine submission');
+    ifr.setAttribute('aria-hidden', 'true');
+    ifr.setAttribute('tabindex', '-1');
+    ifr.referrerPolicy = 'no-referrer';
+    ifr.src = 'https://web.archive.org/save/' + targetUrl;
+    document.body.appendChild(ifr);
+    activeIframes.add(ifr);
+    setTimeout(() => destroyIframe(ifr), 180000);
     return true;
-  } catch (err) {
-    console.error('archiveCurrentPageBackground fatal error:', err);
+  } catch (e) {
     return false;
   }
 }
 
-function resolveNewUrl(input) {
+/* ------------------------------------------------------------------ *
+ * Runs
+ * ------------------------------------------------------------------ */
+function buildQueue(norm, vid, mode) {
+  const templates = templatesFor(vid);
+  const shuffleCheckbox = el('shuffleCheckbox');
+  if (shuffleCheckbox && shuffleCheckbox.checked) shuffleInPlace(templates);
+
+  const limitEl = el('batchLimit');
+  const limit = limitEl ? parseInt(limitEl.value, 10) || 0 : 0;
+  const selected = limit > 0 ? templates.slice(0, limit) : templates;
+
+  const tasks = [];
+  const urls = [];
+  for (const tpl of selected) {
+    const finalUrl = generateUrl(tpl, norm, vid);
+    if (!finalUrl || !isSafeHttpUrl(finalUrl)) continue;
+    tasks.push({ mode: mode, url: finalUrl });
+    urls.push(finalUrl);
+  }
+
+  return { tasks: tasks, urls: urls, skipped: templates.length - selected.length };
+}
+
+function startRun(isRerun) {
+  const urlInput = el('urlInput');
+  const typed = urlInput ? urlInput.value.trim() : '';
+  const raw = typed || getUrlFromQuery(location.search);
+
+  if (!raw) {
+    showNotice('Enter a page URL to generate backlinks.', 'error');
+    if (urlInput) urlInput.focus();
+    return;
+  }
+
+  const norm = normalizeUrl(raw);
+  if (!norm) {
+    showNotice('That does not look like a valid http(s) URL. Try https://example.com/page', 'error');
+    if (urlInput) {
+      urlInput.setAttribute('aria-invalid', 'true');
+      urlInput.focus();
+    }
+    return;
+  }
+
+  if (urlInput) {
+    urlInput.value = norm;
+    urlInput.removeAttribute('aria-invalid');
+  }
+  clearNotice();
+  setExternalLink('Open target', norm);
+  currentTarget = norm;
+  saveSettings();
+
+  runToken += 1;
+  const thisToken = runToken;
+  running = true;
+
+  slots.forEach(s => {
+    if (s.ref) closeWindow(s.ref);
+  });
+  queue = [];
+  totalTasks = 0;
+  doneCount = 0;
+  okCount = 0;
+  failCount = 0;
+
+  if (rerunTimer) {
+    clearTimeout(rerunTimer);
+    rerunTimer = null;
+  }
+
+  const resultsUl = el('results');
+  if (resultsUl && !isRerun) resultsUl.textContent = '';
+  if (resultsUl && isRerun) {
+    const divider = document.createElement('li');
+    divider.className = 'run-divider';
+    divider.textContent = 'New pass \u00B7 ' + new Date().toLocaleTimeString();
+    resultsUl.appendChild(divider);
+  }
+
+  const vid = videoIdOf(norm);
+  const mode = el('modeSelect') ? el('modeSelect').value : 'iframe';
+  const built = buildQueue(norm, vid, mode);
+  queue = built.tasks;
+  activeRunUrls = built.urls;
+  totalTasks = queue.length;
+
+  const limitEl = el('batchLimit');
+  const limit = limitEl ? parseInt(limitEl.value, 10) || 0 : 0;
+  if (limit > 0 && built.skipped > 0) {
+    showNotice('Batch limit active: running the first ' + totalTasks + ' of ' + (totalTasks + built.skipped) + ' generated URLs.', 'warn');
+  } else if (!totalTasks) {
+    showNotice('No usable templates were generated for this URL.', 'error');
+    running = false;
+    return;
+  }
+
+  updateProgress();
+
+  const newUrlInput = el('newUrl');
+  const shareUrl = buildShareUrl(norm);
+  if (newUrlInput) newUrlInput.value = shareUrl;
   try {
-    // If input is already a full URL
-    return new URL(input).toString();
-  } catch (e) {
-    // Otherwise treat it as a relative path
-    if (!input.startsWith('/')) input = '/' + input;
-    return new URL(input, window.location.origin).toString();
+    window.history.replaceState(null, '', location.pathname + '?u=' + encodeURIComponent(norm));
+  } catch (e) { /* file:// or blocked history */ }
+
+  const wayback = el('waybackCheckbox');
+  if (wayback && wayback.checked) archiveTargetUrl(norm);
+
+  const concurrencyRange = el('concurrencyRange');
+  const concurrency = Math.max(1, Math.min(50, parseInt(concurrencyRange ? concurrencyRange.value : 5, 10) || 5));
+
+  slots = Array.from({ length: concurrency }, (_, i) => ({
+    id: i,
+    busy: false,
+    ref: null,
+    timeoutId: null,
+    token: thisToken
+  }));
+
+  const startBtn = el('startBtn');
+  if (startBtn) startBtn.textContent = 'Stop';
+  slots.forEach(s => launchSlot(s));
+}
+
+function finishRun() {
+  if (!running) return;
+  running = false;
+  const startBtn = el('startBtn');
+  if (startBtn) startBtn.textContent = 'Generate Backlinks';
+  slots.forEach(s => {
+    if (s.ref) closeWindow(s.ref);
+    if (s.timeoutId) clearTimeout(s.timeoutId);
+    s.timeoutId = null;
+  });
+
+  const rerunCheckbox = el('rerunCheckbox');
+  if (rerunCheckbox && rerunCheckbox.checked) {
+    rerunTimer = setTimeout(() => startRun(true), RERUN_DELAY);
   }
 }
 
-function startRun() {
-    // prefer typed input; if empty, use the URL query param
-    let raw = urlInput.value.trim() || location.search.slice(1);
-    if (!raw) {
-        alert('Please enter a URL');
-        return;
-    }
-
-    // If the query came from the URL param and is encoded, decode it safely and validate
-    try {
-        const maybeDecoded = decodeURIComponent(raw);
-        // If decode changed it, and normalizeUrl accepts the decoded version, prefer it
-        if (maybeDecoded !== raw && normalizeUrl(maybeDecoded)) raw = maybeDecoded;
-    } catch (e) {
-        // ignore bad percent-encoding and continue with raw
-    }
-
-    // Final validation: require a normalized URL before proceeding
-    const norm = normalizeUrl(raw);
-    if (!norm) {
-        //alert('Invalid URL');
-        return;
-    }
-
-    // ensure external link shows the validated URL
-    setExternalLink("Open URL", norm);
-
-    urlInput.value = norm;
-    saveSettings();
-
-    // Reset run state
-    runToken++;
-    const thisToken = runToken;
-    running = true;
-    queue = [];
-
-    slots.forEach(s => {
-        try {
-            s.ref && s.ref.close();
-        } catch (e) {};
-    });
-    resultsUl.innerHTML = '';
-    totalTasks = 0;
-    doneCount = 0;
-
-    if (rerunTimer) {
-        clearTimeout(rerunTimer);
-        rerunTimer = null;
-    }
-
-    const vid = new URL(norm).searchParams.get('v');
-    let templates = vid ? [...youtubeBacklinkTemplates, 'https://web.archive.org/save/[URL]'] : backlinkTemplates.slice();
-    if (shuffleCheckbox.checked) templates.sort(() => Math.random() - 0.5);
-
-    // NEW: avoid duplicate archive groups (same path+query across archive TLDs)
-    const archiveGroupKeys = new Set();
-
-    // Build queue with generalized archive variant grouping
-    const mode = modeSelect.value;
-    for (const tpl of templates) {
-        try {
-            const finalUrl = generateUrl(tpl, norm, vid);
-            if (!finalUrl || !finalUrl.trim()) continue;
-
-            let isArchive = false,
-                u = null;
-            try {
-                u = new URL(finalUrl);
-                isArchive = isArchiveHost(u.hostname);
-            } catch {}
-
-            if (isArchive) {
-                // Key = protocol + path + search + hash, but WITHOUT hostname (so TLD variants are the same group)
-                const groupKey = `${u.protocol}//${u.pathname}${u.search}${u.hash}`;
-                if (archiveGroupKeys.has(groupKey)) {
-                    // duplicate group → skip
-                    continue;
-                }
-                archiveGroupKeys.add(groupKey);
-
-                const variants = buildArchiveUrlVariants(finalUrl);
-                if (variants && variants.length) {
-                    queue.push({
-                        mode,
-                        archiveVariants: variants
-                    });
-                    continue;
-                }
-            }
-
-            // Non-archive or no variants built
-            queue.push({
-                mode,
-                url: finalUrl
-            });
-        } catch {}
-    }
-
-    totalTasks = queue.length;
-    updateProgress();
-    //newUrlInput.value = location.origin + '?' + norm;
-    //newUrlInput.value = resolveNewUrl(norm);
-
-    //newUrlInput.value = window.location.origin + window.location.pathname +  '?' + encodeURIComponent(norm);
-    newUrlInput.value = window.location.origin + window.location.pathname +  '?' + norm;
-    
-    window.history.replaceState(null, '', location.pathname + '?' + norm);
-
-    // Archive current page (only when a run actually starts)
-    archiveCurrentPageBackground();
-
-    slots = Array.from({
-        length: +concurrencyRange.value
-    }, (_, i) => ({
-        id: i,
-        busy: false,
-        ref: null,
-        timeoutId: null,
-        token: thisToken
-    }));
-    slots.forEach(s => launchSlot(s));
-    startBtn.textContent = 'Stop';
-}
-
-
-function finishRun() {
-    if (!running) return;
-    running = false;
-    startBtn.textContent = 'Generate Backlinks';
-    slots.forEach(s => {
-        try {
-            s.ref && s.ref.close();
-        } catch (e) {};
-        s.timeoutId && clearTimeout(s.timeoutId);
-        s.timeoutId = null;
-    });
-    if (rerunCheckbox.checked) {
-        rerunTimer = setTimeout(startRun, 500);
-    }
-}
-
 function stopRun() {
-    running = false;
-    queue = [];
-    startBtn.textContent = 'Generate Backlinks';
-    if (rerunTimer) {
-        clearTimeout(rerunTimer);
-        rerunTimer = null;
+  running = false;
+  runToken += 1; // invalidate stale callbacks
+  queue = [];
+  const startBtn = el('startBtn');
+  if (startBtn) startBtn.textContent = 'Generate Backlinks';
+  if (rerunTimer) {
+    clearTimeout(rerunTimer);
+    rerunTimer = null;
+  }
+  slots.forEach(s => {
+    if (s.timeoutId) {
+      clearTimeout(s.timeoutId);
+      s.timeoutId = null;
     }
-    slots.forEach(s => {
-        if (s.timeoutId) {
-            try {
-                clearTimeout(s.timeoutId);
-            } catch (e) {};
-            s.timeoutId = null;
-        }
-        try {
-            s.ref && s.ref.close();
-        } catch (e) {}
-    });
-    activeWindows.forEach(w => {
-        try {
-            w.close();
-        } catch (e) {}
-    });
-    activeWindows.clear();
-    activeIframes.forEach(ifr => {
-        try {
-            ifr.remove();
-        } catch (e) {}
-    });
-    activeIframes.clear();
+    s.busy = false;
+    if (s.ref) closeWindow(s.ref);
+  });
+  activeWindows.forEach(w => closeWindow(w));
+  activeWindows.clear();
+  activeIframes.forEach(ifr => destroyIframe(ifr));
+  activeIframes.clear();
+  updateProgress();
 }
 
-downloadBtn.addEventListener('click', () => {
-    const raw = urlInput.value.trim(),
-        norm = normalizeUrl(raw);
-    if (!norm) {
-        alert('Invalid URL');
-        return;
-    }
-    const vid = new URL(norm).searchParams.get('v');
-    let templates = vid ? [...youtubeBacklinkTemplates, 'https://web.archive.org/save/[URL]'] : backlinkTemplates.slice();
-    if (shuffleCheckbox.checked) templates.sort(() => Math.random() - 0.5);
-    const urls = templates.map(tpl => {
-        try {
-            return generateUrl(tpl, norm, vid);
-        } catch {
-            return '';
-        }
-    }).filter(Boolean);
-    const blob = new Blob([urls.join('\n')], {
-        type: 'text/plain'
-    });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'backlinks.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-});
+/* ------------------------------------------------------------------ *
+ * Download / copy
+ * ------------------------------------------------------------------ */
+function downloadUrls() {
+  const urlInput = el('urlInput');
+  const raw = (urlInput && urlInput.value.trim()) || currentTarget;
+  const norm = normalizeUrl(raw);
+  if (!norm) {
+    showNotice('Enter a valid URL before downloading.', 'error');
+    return;
+  }
 
-window.addEventListener('DOMContentLoaded', async () => {
-    loadSettings();
-    await loadTemplates();
-    updateReuseToggleState();
-    const param = location.search.slice(1);
-    if (param) {
-        const norm = getNormalizedUrlFromParam(param);
-        if (norm) {
-            urlInput.value = norm;
-            startRun();
-        } else {
-            //alert('Invalid URL');
-            
-            const here = window.location.href.split('#')[0];
-            const testUrl = here + (here.includes('?') ? '&' : '?') + here;
-            setExternalLink("Open Test", testUrl);
-        }
-    } else {
-        const here = window.location.href.split('#')[0];
-        const testUrl = here + (here.includes('?') ? '&' : '?') + here;
-        setExternalLink("Open Test", testUrl);
-    }
-});
+  // Reuse exactly what the last run produced, so the file matches the screen.
+  let urls = activeRunUrls;
+  if (!urls.length || norm !== currentTarget) {
+    const vid = videoIdOf(norm);
+    urls = templatesFor(vid)
+      .map(tpl => generateUrl(tpl, norm, vid))
+      .filter(Boolean);
+  }
 
-function setExternalLink(txt, href) {
-    const linkEl = externalLink || document.getElementById('externalLink');
-    if (!linkEl) return;
-    linkEl.href = href;
-    linkEl.style.display = "inline-block";
+  const blob = new Blob([urls.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'backlinks-' + (new URL(norm).hostname || 'list') + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+async function copyShareUrl() {
+  const newUrlInput = el('newUrl');
+  const copyBtn = el('copyBtn');
+  if (!newUrlInput || !newUrlInput.value) return;
+  let copied = false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(newUrlInput.value);
+      copied = true;
+    }
+  } catch (e) {
+    copied = false;
+  }
+  if (!copied) {
     try {
-        linkEl.innerHTML = "🔗 " + txt + " → " + (new URL(href)).hostname;
-    } catch {
-        linkEl.innerHTML = "🔗 " + txt;
+      newUrlInput.select();
+      copied = document.execCommand('copy');
+    } catch (e) {
+      copied = false;
     }
+  }
+  if (copyBtn) {
+    const original = copyBtn.dataset.label || copyBtn.textContent;
+    copyBtn.dataset.label = original;
+    copyBtn.textContent = copied ? 'Copied \u2713' : 'Press Ctrl+C';
+    setTimeout(() => {
+      copyBtn.textContent = original;
+    }, 1500);
+  }
 }
 
-/**
- * Spawn a hidden iframe that hits the Wayback Save API for the given URL.
- * The iframe is appended directly to document.body and removed after 3 minutes.
- * @param {string} targetUrl - The URL to archive (defaults to window.location.href)
- */
-/*
-function spawnWaybackSaver(targetUrl) {
-    const url = (typeof targetUrl === "string" && targetUrl.trim()) ? targetUrl.trim() : window.location.href;
+/* ------------------------------------------------------------------ *
+ * Boot
+ * ------------------------------------------------------------------ */
+async function boot() {
+  const modeSelect = el('modeSelect');
+  const concurrencyRange = el('concurrencyRange');
+  const concurrentCount = el('concurrentCount');
+  const urlInput = el('urlInput');
+  const startBtn = el('startBtn');
+  const toggleAdvancedBtn = el('toggleAdvancedBtn');
+  const advancedPanel = el('advancedPanel');
+  const copyBtn = el('copyBtn');
+  const downloadBtn = el('downloadBtn');
+  const reuseToggle = el('reuseToggle');
+  const rerunCheckbox = el('rerunCheckbox');
+  const shuffleCheckbox = el('shuffleCheckbox');
+  const waybackCheckbox = el('waybackCheckbox');
+  const batchLimit = el('batchLimit');
+  const progressBar = el('progressBar');
+  const progressText = el('progressText');
+  const externalLink = el('externalLink');
 
-    // Create the hidden iframe
-    const iframe = document.createElement("iframe");
-    iframe.title = "Background Wayback Saver";
-    iframe.referrerPolicy = "no-referrer-when-downgrade";
+  loadSettings();
+  updateReuseToggleState();
 
-    iframe.className = "hidden-iframe";
+  if (concurrentCount && concurrencyRange) concurrentCount.textContent = concurrencyRange.value;
 
-    // Build Wayback Save URL
-    //const waybackUrl = "https://web.archive.org/save/" + encodeURIComponent(url);
-    const waybackUrl = "https://web.archive.org/save/" + url;
-
-    // Append to the body and load
-    document.body.appendChild(iframe);
-    iframe.src = waybackUrl;
-
-    // Auto-remove after 3 minutes (180000 ms)
-    const ttl = setTimeout(() => {
-        try {
-            iframe.remove();
-        } catch (_) {}
-        clearTimeout(ttl);
-    }, 180000);
-}
-*/
-
-/**
- * Hook into your existing Start button (id="startStopBtn").
- * Each press spawns a background iframe that auto-closes after 3 minutes.
- */
-function wireStartButton() {
-    const btn = document.getElementById("startBtn");
-    if (!btn) return;
-    if (btn.dataset.bgWaybackWired === "1") return;
-    btn.dataset.bgWaybackWired = "1";
-
-    btn.addEventListener("click", () => {
-        if (!running) {
-            //spawnWaybackSaver(window.location.href);
-        }
+  if (modeSelect) {
+    modeSelect.addEventListener('change', function () {
+      updateReuseToggleState();
+      saveSettings();
     });
+  }
+
+  [modeSelect, reuseToggle, rerunCheckbox, shuffleCheckbox, waybackCheckbox, batchLimit].forEach(node => {
+    if (node) node.addEventListener('change', saveSettings);
+  });
+
+  if (concurrencyRange) {
+    concurrencyRange.addEventListener('input', function () {
+      if (concurrentCount) concurrentCount.textContent = concurrencyRange.value;
+      saveSettings();
+    });
+  }
+
+  if (toggleAdvancedBtn && advancedPanel) {
+    toggleAdvancedBtn.setAttribute('aria-expanded', 'false');
+    toggleAdvancedBtn.addEventListener('click', function () {
+      const open = advancedPanel.style.display === 'none';
+      advancedPanel.style.display = open ? 'block' : 'none';
+      toggleAdvancedBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggleAdvancedBtn.textContent = open ? '\u2699\uFE0F Advanced \u25B2' : '\u2699\uFE0F Advanced \u25BC';
+    });
+  }
+
+  if (startBtn) {
+    startBtn.addEventListener('click', function () {
+      if (running) stopRun();
+      else startRun(false);
+    });
+  }
+
+  if (urlInput) {
+    urlInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!running) startRun(false);
+      }
+    });
+    urlInput.addEventListener('input', function () {
+      urlInput.removeAttribute('aria-invalid');
+    });
+  }
+
+  if (copyBtn) copyBtn.addEventListener('click', copyShareUrl);
+  if (downloadBtn) downloadBtn.addEventListener('click', downloadUrls);
+  if (externalLink) externalLink.style.display = 'none';
+
+  if (progressBar) progressBar.style.width = '0%';
+  if (progressText) progressText.textContent = '0/0 (0%)';
+
+  await loadTemplates();
+
+  const fromQuery = getUrlFromQuery(location.search);
+  if (fromQuery) {
+    if (urlInput) urlInput.value = fromQuery;
+    startRun(false);
+  }
 }
 
-// Initialize once DOM is ready
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", wireStartButton, {
-        once: true
-    });
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot, { once: true });
 } else {
-    wireStartButton();
+  boot();
 }
 
-// Expose function globally for manual triggering
-window.spawnWaybackSaver = spawnWaybackSaver;
+// Expose a tiny, documented API for manual/console use.
+window.BacklinkGenerator = {
+  normalizeUrl: normalizeUrl,
+  isValidURL: isValidURL,
+  generateUrl: generateUrl,
+  buildMap: buildMap,
+  loadTemplates: loadTemplates,
+  start: function () { startRun(false); },
+  stop: stopRun,
+  archiveTargetUrl: archiveTargetUrl
+};

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://backlink.is-an.ai/sitemap.xml

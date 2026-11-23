@@ -1,24 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="https://backlink-generator-tool.github.io/backlink-generator-tool/styles.css" />
-    <link rel="stylesheet" href="https://backlink-generator-tool.github.io/backlink-generator-tool/stealth-iframe.css" />
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://image.thum.io; font-src 'self' data:; connect-src *; frame-src http: https:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Free Backlink Generator — Auto Submission &amp; Instant Indexing Tool</title>
+  <meta name="description" content="Free backlink generator that submits your page to 4,400+ backlink, ping and archive endpoints in one click. No sign-up, no server, runs entirely in your browser.">
+  <link rel="canonical" href="https://backlink.is-an.ai/">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="author" content="F9XR Team">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Backlink Generator Tool">
+  <meta property="og:title" content="Free Backlink Generator — Auto Submission &amp; Instant Indexing Tool">
+  <meta property="og:description" content="Submit your page to 2,700+ backlink and ping endpoints in one click. 100% client-side, free, no account needed.">
+  <meta property="og:url" content="https://backlink.is-an.ai/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Free Backlink Generator — Auto Submission &amp; Instant Indexing Tool">
+  <meta name="twitter:description" content="Submit your page to 2,700+ backlink and ping endpoints in one click. 100% client-side and free.">
+
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./stealth-iframe.css">
+  <link rel="preconnect" href="https://image.thum.io" crossorigin>
+
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #0f172a;
+      background: #ffffff;
+    }
+    a { color: #1d4ed8; }
+    .skip-link {
+      position: absolute; left: -9999px; top: 0;
+      background: #111827; color: #fff; padding: 10px 14px; z-index: 100;
+      border-radius: 0 0 8px 0;
+    }
+    .skip-link:focus { left: 0; }
+    .site-header {
+      border-bottom: 1px solid #e5e7eb;
+      background: linear-gradient(135deg, #eff6ff, #ffffff 60%);
+    }
+    .site-header .inner, main, .site-footer .inner {
+      max-width: 1080px; margin: 0 auto; padding: 0 18px;
+    }
+    .site-header .inner {
+      display: flex; flex-wrap: wrap; gap: 10px 18px;
+      align-items: center; justify-content: space-between;
+      padding-top: 14px; padding-bottom: 14px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; text-decoration: none; color: #0f172a; }
+    .brand span.mark {
+      display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px;
+      background: linear-gradient(135deg, #2563eb, #0ea5e9); color: #fff; font-size: 1rem;
+    }
+    .site-nav { display: flex; flex-wrap: wrap; gap: 16px; font-size: .92rem; }
+    .site-nav a { color: #374151; text-decoration: none; font-weight: 600; }
+    .site-nav a:hover { color: #1d4ed8; text-decoration: underline; }
+    .hero { padding: 40px 0 12px; }
+    .hero h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.2; margin: 0 0 12px; letter-spacing: -.02em; }
+    .hero p.lead { font-size: 1.05rem; color: #475569; max-width: 62ch; margin: 0 0 18px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; padding: 0; list-style: none; }
+    .chips li { font-size: .8rem; font-weight: 700; color: #1e3a8a; background: #eff6ff; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 999px; }
+    .tool-shell {
+      border: 1px solid #e5e7eb; border-radius: 16px; padding: 14px;
+      background: #fff; box-shadow: 0 18px 45px rgba(15, 23, 42, .07);
+    }
+    .legend { margin: 10px 0 0; font-size: .82rem; color: #6b7280; }
+    section { padding: 34px 0; border-top: 1px solid #eef2f7; }
+    section h2 { font-size: 1.35rem; margin: 0 0 12px; }
+    section h3 { font-size: 1.02rem; margin: 18px 0 6px; }
+    .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+    .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px 16px; background: #fbfdff; }
+    .card h3 { margin-top: 0; }
+    .card p { margin: 0; color: #475569; font-size: .94rem; }
+    ol.steps { padding-left: 20px; color: #334155; }
+    ol.steps li { margin-bottom: 6px; }
+    details.faq { border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 14px; background: #fff; margin-bottom: 8px; }
+    details.faq summary { cursor: pointer; font-weight: 700; }
+    details.faq p { margin: 8px 0 0; color: #475569; }
+    .site-footer { border-top: 1px solid #e5e7eb; margin-top: 30px; background: #f8fafc; }
+    .site-footer .inner { padding-top: 22px; padding-bottom: 26px; text-align: center; font-size: .88rem; color: #64748b; }
+    .site-footer a { font-weight: 700; }
+    .site-footer p { margin: 4px 0; }
+    @media (max-width: 640px) {
+      .hero { padding-top: 26px; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Backlink Generator Tool",
+        "url": "https://backlink.is-an.ai/",
+        "applicationCategory": "SEO Tool",
+        "operatingSystem": "Any (browser)",
+        "description": "Free client-side backlink generator that submits a page URL to backlink, ping and archive endpoints.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "publisher": { "@type": "Organization", "name": "F9XR Team", "url": "https://f9xr.org" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is the backlink generator really free?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. The tool runs entirely in your browser, needs no account and has no paid tier." }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need a server or API key?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. Templates are static JSON files and all submissions happen from your own browser session." }
+          },
+          {
+            "@type": "Question",
+            "name": "Which mode should I use?",
+            "acceptedAnswer": { "@type": "Answer", "text": "IFrame is the quietest default. Popup or Tab works for sites that don't load in frames, and Ping only checks reachability through a public CORS proxy." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+  <a class="skip-link" href="#tool">Skip to the generator</a>
+
+  <header class="site-header">
+    <div class="inner">
+      <a class="brand" href="./index.html">
+        <span class="mark" aria-hidden="true">🔗</span>
+        Backlink Generator Tool
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="#tool">Generator</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#modes">Modes</a>
+        <a href="#faq">FAQ</a>
+        <a href="./demo/">Demo pages</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="hero">
+      <h1>Free backlink generator with one-click auto submission</h1>
+      <p class="lead">
+        Paste a page URL and the tool builds and opens up to 4,400 backlink, ping, social-share and
+        archive requests for that exact page. Everything runs client-side in your browser —
+        no sign-up, no backend, nothing stored on a server.
+      </p>
+      <ul class="chips">
+        <li>2,700+ target hosts</li>
+        <li>IFrame · Popup · Tab · Ping</li>
+        <li>YouTube timestamp links</li>
+        <li>CSV-free bulk URL export</li>
+        <li>No tracking scripts</li>
+      </ul>
+    </div>
+
+    <div class="tool-shell" id="tool">
       <!-- Backlink Generator Tool UI Block -->
       <div id="controls">
-        <input id="urlInput" type="text" placeholder="Enter your page URL…" size="50">
-        <button id="startBtn">Generate Backlinks</button>
-        <button id="toggleAdvancedBtn">⚙️ Advanced ▼</button>
+        <label class="visually-hidden" for="urlInput" style="position:absolute;left:-9999px;">Page URL to promote</label>
+        <input id="urlInput" type="text" inputmode="url" autocomplete="url" placeholder="Enter your page URL…" size="50" aria-describedby="toolHelp">
+        <button id="startBtn" type="button">Generate Backlinks</button>
+        <button id="toggleAdvancedBtn" type="button" aria-controls="advancedPanel">⚙️ Advanced ▼</button>
       </div>
-    
+      <p id="toolHelp" class="legend">Enter the exact page you want links for, e.g. <code>https://example.com/blog/post</code>. Press Enter to start.</p>
+      <p id="toolStatus" class="tool-status" role="status" hidden></p>
+
       <div id="advancedPanel" style="display: none;">
         <label>Mode:
           <select id="modeSelect">
-            <option value="iframe">IFrame</option>
+            <option value="iframe">IFrame (quietest)</option>
             <option value="popup">Popup</option>
             <option value="tab">Tab</option>
-            <option value="ping">Ping</option>
+            <option value="ping">Ping (CORS proxy)</option>
           </select>
         </label>
         <label>Popup/Tab behavior:
@@ -27,36 +193,113 @@
             <option value="reuse">Reuse same window/tab</option>
           </select>
         </label>
-        <label>Max Concurrent:
+        <label>Max concurrent:
           <input id="concurrencyRange" type="range" min="1" max="50" value="5">
           <span id="concurrentCount">5</span>
         </label>
+        <label>Max URLs per run:
+          <select id="batchLimit">
+            <option value="0">All templates</option>
+            <option value="100">100</option>
+            <option value="250">250</option>
+            <option value="500">500</option>
+            <option value="1000">1,000</option>
+          </select>
+        </label>
         <label><input type="checkbox" id="rerunCheckbox"> Repeat after completion</label>
         <label><input type="checkbox" id="shuffleCheckbox" checked> Shuffle templates before run</label>
+        <label><input type="checkbox" id="waybackCheckbox"> Also submit the target to the Wayback Machine (optional, sends the URL to web.archive.org)</label>
       </div>
-    
+
       <div id="shareControls">
+        <label class="visually-hidden" for="newUrl" style="position:absolute;left:-9999px;">Shareable URL</label>
         <input id="newUrl" type="text" readonly placeholder="Shareable URL appears here…">
-        <button id="copyBtn">Copy</button>
+        <button id="copyBtn" type="button">Copy</button>
       </div>
-    
-      <button id="downloadBtn">Download URLs</button>
-      <a id="externalLink" href="#" target="_self">🔗 Open Test</a>
-    
+
+      <button id="downloadBtn" type="button">Download URLs</button>
+      <a id="externalLink" href="#" target="_self" rel="noopener">🔗 Open target</a>
+
       <div id="progressContainer">
         <div style="background:#ddd; height:20px; border-radius:10px;">
           <div id="progressBar" style="height:100%; width:0%; background:#4caf50;"></div>
         </div>
-        <div id="progressText">0/0 (0%)</div>
+        <div id="progressText" aria-live="polite">0/0 (0%)</div>
       </div>
-    
-      <!-- Website Screenshot Preview -->
-      <img id="previewwebsite" alt="Website Screenshot">
-    
-      <ul id="results" class="results-list"></ul>
 
-    <script src="https://backlink-generator-tool.github.io/backlink-generator-tool/backlink-generator.js"></script>
-    <script src="https://backlink-generator-tool.github.io/backlink-generator-tool/website-screenshot-preview.js"></script>
-    
+      <!-- Website Screenshot Preview (filled by website-screenshot-preview.js) -->
+      <img id="previewwebsite" alt="Website screenshot preview" loading="lazy" referrerpolicy="no-referrer">
+
+      <ul id="results" class="results-list" aria-live="polite" aria-label="Generated backlink URLs"></ul>
+      <p class="tool-legend">✔ means the target loaded, ✖ means it timed out or was blocked. A load is not proof that a link was created — check the strongest targets manually.</p>
+    </div>
+
+    <section id="how-it-works">
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li>You enter one URL. The engine validates it and builds a placeholder map (host, path, query, video ID).</li>
+        <li>Every URL template in the JSON dataset is filled in with your page, so links point at exactly that page.</li>
+        <li>The chosen delivery mode opens each target once, waits for it to load, and records whether it did.</li>
+        <li>Copy the shareable link to re-run the same URL later, or download the full list as a text file.</li>
+      </ol>
+    </section>
+
+    <section id="modes">
+      <h2>Delivery modes</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>IFrame</h3>
+          <p>Loads each target in a hidden 1×1 frame. Quietest mode, works without popup permission, and the best default for bulk runs.</p>
+        </div>
+        <div class="card">
+          <h3>Popup / Tab</h3>
+          <p>Opens real windows. Use it when an endpoint refuses to load in a frame. Allow pop-ups for this site first.</p>
+        </div>
+        <div class="card">
+          <h3>Ping</h3>
+          <p>Requests each URL through a public CORS proxy and records whether it answered. Fast, but a proxy error page still counts as a response.</p>
+        </div>
+        <div class="card">
+          <h3>Archive submissions</h3>
+          <p>Archive endpoints are part of the normal template list: each one asks a snapshot service to fetch the page, which gives crawlers another URL to discover. The Wayback Machine copy is separate and only runs when you tick its box.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2>Frequently asked questions</h2>
+      <details class="faq">
+        <summary>Is this really free, and do I need an account?</summary>
+        <p>Yes — free, no account. The engine, the templates and the export are all static files served to your browser.</p>
+      </details>
+      <details class="faq">
+        <summary>Do these submissions count as real backlinks?</summary>
+        <p>Most are index-discovery and ping signals: they help crawlers find a URL faster. Treat them as a discovery helper, not a replacement for editorial links.</p>
+      </details>
+      <details class="faq">
+        <summary>Why do some targets show ✖?</summary>
+        <p>Endpoints rate-limit, block frames or sit behind a redirect chain. Lower concurrency, shuffle templates, or run again later.</p>
+      </details>
+      <details class="faq">
+        <summary>What data leaves my browser?</summary>
+        <p>Only the requests the tool opens: the generated backlink URLs, the optional thum.io preview of the URL you typed, and — only if you tick the box — a Wayback Machine submission.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer bgt-footer">
+    <div class="inner">
+      <p>Backlink Generator Tool · free, client-side SEO utility.</p>
+      <p>Enhanced by <a href="https://f9xr.org" target="_blank" rel="noopener">F9XR Team</a></p>
+      <p><a href="./demo/">Browse the demo pages</a></p>
+    </div>
+  </footer>
+
+  <noscript>
+    <p style="padding:0 18px 24px;"><strong>JavaScript required:</strong> enable JavaScript to run the Backlink Generator.</p>
+  </noscript>
+
+  <script src="./backlink-generator.js"></script>
+  <script src="./website-screenshot-preview.js"></script>
 </body>
 </html>
