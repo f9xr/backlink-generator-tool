@@ -55,7 +55,7 @@ for (const [name, list] of [['backlink-templates.json', generic], ['youtube-back
 if (proxies) {
   for (const tpl of proxies) {
     if (/corsproxy\.io/i.test(tpl) && !/[?&]url=/i.test(tpl)) {
-      errors.push('cors-proxies.json: corsproxy.io needs ?url= — ' + tpl);
+      errors.push('cors-proxies.json: corsproxy.io needs ?url= - ' + tpl);
     }
   }
 }
@@ -114,4 +114,4 @@ if (errors.length) {
   console.error('\n' + errors.length + ' problem(s) found.');
   process.exit(1);
 }
-console.log('OK — ' + pages.length + ' demo pages and 3 data files validated.');
+console.log('OK - ' + pages.length + ' demo pages and 3 data files validated.');

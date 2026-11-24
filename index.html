@@ -4,94 +4,28 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://image.thum.io; font-src 'self' data:; connect-src *; frame-src http: https:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Free Backlink Generator — Auto Submission &amp; Instant Indexing Tool</title>
+  <title>Free Backlink Generator: Auto Submission and Indexing Tool</title>
   <meta name="description" content="Free backlink generator that submits your page to 4,400+ backlink, ping and archive endpoints in one click. No sign-up, no server, runs entirely in your browser.">
   <link rel="canonical" href="https://backlink.is-an.ai/">
   <meta name="robots" content="index,follow,max-image-preview:large">
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#141415">
   <meta name="author" content="F9XR Team">
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Backlink Generator Tool">
-  <meta property="og:title" content="Free Backlink Generator — Auto Submission &amp; Instant Indexing Tool">
-  <meta property="og:description" content="Submit your page to 2,700+ backlink and ping endpoints in one click. 100% client-side, free, no account needed.">
+  <meta property="og:title" content="Free Backlink Generator: Auto Submission and Indexing Tool">
+  <meta property="og:description" content="Submit your page to 4,400+ backlink and ping endpoints in one click. 100% client-side, free, no account needed.">
   <meta property="og:url" content="https://backlink.is-an.ai/">
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Free Backlink Generator — Auto Submission &amp; Instant Indexing Tool">
-  <meta name="twitter:description" content="Submit your page to 2,700+ backlink and ping endpoints in one click. 100% client-side and free.">
+  <meta name="twitter:title" content="Free Backlink Generator: Auto Submission and Indexing Tool">
+  <meta name="twitter:description" content="Submit your page to 4,400+ backlink and ping endpoints in one click. 100% client-side and free.">
 
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./theme.css">
+  <link rel="stylesheet" href="./pill-nav.css">
+  <link rel="stylesheet" href="./magic-bento.css">
   <link rel="stylesheet" href="./stealth-iframe.css">
   <link rel="preconnect" href="https://image.thum.io" crossorigin>
-
-  <style>
-    :root { color-scheme: light; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      color: #0f172a;
-      background: #ffffff;
-    }
-    a { color: #1d4ed8; }
-    .skip-link {
-      position: absolute; left: -9999px; top: 0;
-      background: #111827; color: #fff; padding: 10px 14px; z-index: 100;
-      border-radius: 0 0 8px 0;
-    }
-    .skip-link:focus { left: 0; }
-    .site-header {
-      border-bottom: 1px solid #e5e7eb;
-      background: linear-gradient(135deg, #eff6ff, #ffffff 60%);
-    }
-    .site-header .inner, main, .site-footer .inner {
-      max-width: 1080px; margin: 0 auto; padding: 0 18px;
-    }
-    .site-header .inner {
-      display: flex; flex-wrap: wrap; gap: 10px 18px;
-      align-items: center; justify-content: space-between;
-      padding-top: 14px; padding-bottom: 14px;
-    }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; text-decoration: none; color: #0f172a; }
-    .brand span.mark {
-      display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px;
-      background: linear-gradient(135deg, #2563eb, #0ea5e9); color: #fff; font-size: 1rem;
-    }
-    .site-nav { display: flex; flex-wrap: wrap; gap: 16px; font-size: .92rem; }
-    .site-nav a { color: #374151; text-decoration: none; font-weight: 600; }
-    .site-nav a:hover { color: #1d4ed8; text-decoration: underline; }
-    .hero { padding: 40px 0 12px; }
-    .hero h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.2; margin: 0 0 12px; letter-spacing: -.02em; }
-    .hero p.lead { font-size: 1.05rem; color: #475569; max-width: 62ch; margin: 0 0 18px; }
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; padding: 0; list-style: none; }
-    .chips li { font-size: .8rem; font-weight: 700; color: #1e3a8a; background: #eff6ff; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 999px; }
-    .tool-shell {
-      border: 1px solid #e5e7eb; border-radius: 16px; padding: 14px;
-      background: #fff; box-shadow: 0 18px 45px rgba(15, 23, 42, .07);
-    }
-    .legend { margin: 10px 0 0; font-size: .82rem; color: #6b7280; }
-    section { padding: 34px 0; border-top: 1px solid #eef2f7; }
-    section h2 { font-size: 1.35rem; margin: 0 0 12px; }
-    section h3 { font-size: 1.02rem; margin: 18px 0 6px; }
-    .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
-    .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px 16px; background: #fbfdff; }
-    .card h3 { margin-top: 0; }
-    .card p { margin: 0; color: #475569; font-size: .94rem; }
-    ol.steps { padding-left: 20px; color: #334155; }
-    ol.steps li { margin-bottom: 6px; }
-    details.faq { border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 14px; background: #fff; margin-bottom: 8px; }
-    details.faq summary { cursor: pointer; font-weight: 700; }
-    details.faq p { margin: 8px 0 0; color: #475569; }
-    .site-footer { border-top: 1px solid #e5e7eb; margin-top: 30px; background: #f8fafc; }
-    .site-footer .inner { padding-top: 22px; padding-bottom: 26px; text-align: center; font-size: .88rem; color: #64748b; }
-    .site-footer a { font-weight: 700; }
-    .site-footer p { margin: 4px 0; }
-    @media (max-width: 640px) {
-      .hero { padding-top: 26px; }
-    }
-  </style>
 
   <script type="application/ld+json">
   {
@@ -123,7 +57,7 @@
           {
             "@type": "Question",
             "name": "Which mode should I use?",
-            "acceptedAnswer": { "@type": "Answer", "text": "IFrame is the quietest default. Popup or Tab works for sites that don't load in frames, and Ping only checks reachability through a public CORS proxy." }
+            "acceptedAnswer": { "@type": "Answer", "text": "IFrame is the quietest default. Popup or Tab works for sites that do not load in frames, and Ping only checks reachability through a public CORS proxy." }
           }
         ]
       }
@@ -134,48 +68,128 @@
 <body>
   <a class="skip-link" href="#tool">Skip to the generator</a>
 
-  <header class="site-header">
-    <div class="inner">
-      <a class="brand" href="./index.html">
-        <span class="mark" aria-hidden="true">🔗</span>
-        Backlink Generator Tool
+  <nav class="sidebar-rail" aria-label="Sections">
+    <a class="rail-item" href="#tool" aria-current="true" title="Generator">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.914 4a1.5 1.5 0 0 0-2.474-1.561l-9 9A1.5 1.5 0 0 0 5.5 14h4.002a.5.5 0 0 1 .471.666L8.086 20a1.5 1.5 0 0 0 2.475 1.56l9-9A1.5 1.5 0 0 0 18.5 10h-3.997a.5.5 0 0 1-.472-.667z"/></svg>
+      <span class="rail-label">Tool</span>
+    </a>
+    <a class="rail-item" href="#how-it-works" title="How it works">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v16"/><path d="M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+      <span class="rail-label">How</span>
+    </a>
+    <a class="rail-item" href="#modes" title="Delivery modes">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg>
+      <span class="rail-label">Modes</span>
+    </a>
+    <a class="rail-item" href="#faq" title="FAQ">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 9.5a3 2.5 0 0 1 6 0c0 2-2 2-3 3.5"/><path d="M12 17h.01"/></svg>
+      <span class="rail-label">FAQ</span>
+    </a>
+    <a class="rail-item" href="./demo/" title="Demo pages">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+      <span class="rail-label">Demos</span>
+    </a>
+  </nav>
+
+  <header class="top-nav">
+    <div class="top-nav__inner">
+      <a class="brand-text" href="./index.html">
+        <span>Backlink Generator</span>
+        <span class="brand-sub">Tool</span>
       </a>
-      <nav class="site-nav" aria-label="Main">
-        <a href="#tool">Generator</a>
-        <a href="#how-it-works">How it works</a>
-        <a href="#modes">Modes</a>
-        <a href="#faq">FAQ</a>
-        <a href="./demo/">Demo pages</a>
+
+      <nav class="pill-nav" id="pillNav" aria-label="Main" data-size="md" data-surface="glass" data-hover="fill" data-indicator="pill" data-collapse="auto" data-intro="true" data-bounce="0.3">
+        <span class="pill-nav__logo pill-nav__surface">
+          <a class="pill-nav__logo-link" href="./index.html" aria-label="Backlink Generator Tool home">
+            <span class="pill-nav__mark">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </span>
+          </a>
+          <span class="pill-nav__rim"></span>
+        </span>
+        <div class="pill-nav__bar pill-nav__surface">
+          <div class="pill-nav__track">
+            <ul class="pill-nav__list">
+              <li class="pill-nav__slot">
+                <a class="pill-nav__item" href="#tool" aria-current="page">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.914 4a1.5 1.5 0 0 0-2.474-1.561l-9 9A1.5 1.5 0 0 0 5.5 14h4.002a.5.5 0 0 1 .471.666L8.086 20a1.5 1.5 0 0 0 2.475 1.56l9-9A1.5 1.5 0 0 0 18.5 10h-3.997a.5.5 0 0 1-.472-.667z"/></svg>
+                  Generator
+                </a>
+              </li>
+              <li class="pill-nav__slot">
+                <a class="pill-nav__item" href="#how-it-works">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v16"/><path d="M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+                  How it works
+                </a>
+              </li>
+              <li class="pill-nav__slot">
+                <a class="pill-nav__item" href="#modes">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg>
+                  Modes
+                </a>
+              </li>
+              <li class="pill-nav__slot">
+                <a class="pill-nav__item" href="#faq">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9 9.5a3 2.5 0 0 1 6 0c0 2-2 2-3 3.5"/><path d="M12 17h.01"/></svg>
+                  FAQ
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span class="pill-nav__rim"></span>
+        </div>
       </nav>
+
+      <div class="nav-cta">
+        <a class="btn btn-secondary" href="./demo/">Demo pages</a>
+        <a class="btn btn-primary" href="#tool">Generate backlinks</a>
+      </div>
     </div>
   </header>
 
   <main id="main">
     <div class="hero">
-      <h1>Free backlink generator with one-click auto submission</h1>
-      <p class="lead">
-        Paste a page URL and the tool builds and opens up to 4,400 backlink, ping, social-share and
-        archive requests for that exact page. Everything runs client-side in your browser —
-        no sign-up, no backend, nothing stored on a server.
-      </p>
-      <ul class="chips">
-        <li>2,700+ target hosts</li>
-        <li>IFrame · Popup · Tab · Ping</li>
-        <li>YouTube timestamp links</li>
-        <li>CSV-free bulk URL export</li>
-        <li>No tracking scripts</li>
-      </ul>
+      <div class="hero-banner">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">4,400+ endpoints</p>
+            <h1>Free backlink generator with one-click submission</h1>
+            <p class="lead">
+              Paste a page URL and the tool builds and opens up to 4,400 backlink, ping, social-share
+              and archive requests for that exact page. Everything runs client-side in your browser.
+              No sign-up, no backend, nothing stored on a server.
+            </p>
+            <ul class="chips">
+              <li>2,700+ target hosts</li>
+              <li>IFrame, Popup, Tab, Ping</li>
+              <li>YouTube timestamp links</li>
+              <li>Bulk URL export</li>
+              <li>No tracking scripts</li>
+            </ul>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#tool">Start a run</a>
+              <a class="btn btn-tertiary" href="#how-it-works">See how it works</a>
+            </div>
+          </div>
+          <img class="hero-art" src="./assets/thiings/link.avif" alt="" width="148" height="148" aria-hidden="true">
+        </div>
+      </div>
     </div>
 
     <div class="tool-shell" id="tool">
-      <!-- Backlink Generator Tool UI Block -->
       <div id="controls">
         <label class="visually-hidden" for="urlInput" style="position:absolute;left:-9999px;">Page URL to promote</label>
-        <input id="urlInput" type="text" inputmode="url" autocomplete="url" placeholder="Enter your page URL…" size="50" aria-describedby="toolHelp">
-        <button id="startBtn" type="button">Generate Backlinks</button>
-        <button id="toggleAdvancedBtn" type="button" aria-controls="advancedPanel">⚙️ Advanced ▼</button>
+        <input id="urlInput" type="text" inputmode="url" autocomplete="url" placeholder="Enter your page URL" size="50" aria-describedby="toolHelp">
+        <button id="startBtn" class="btn btn-primary" type="button">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.914 4a1.5 1.5 0 0 0-2.474-1.561l-9 9A1.5 1.5 0 0 0 5.5 14h4.002a.5.5 0 0 1 .471.666L8.086 20a1.5 1.5 0 0 0 2.475 1.56l9-9A1.5 1.5 0 0 0 18.5 10h-3.997a.5.5 0 0 1-.472-.667z"/></svg>
+          Generate Backlinks
+        </button>
+        <button id="toggleAdvancedBtn" class="btn btn-tertiary" type="button" aria-controls="advancedPanel">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/></svg>
+          Advanced
+        </button>
       </div>
-      <p id="toolHelp" class="legend">Enter the exact page you want links for, e.g. <code>https://example.com/blog/post</code>. Press Enter to start.</p>
+      <p id="toolHelp" class="tool-legend">Enter the exact page you want links for, for example <code>https://example.com/blog/post</code>. Press Enter to start.</p>
       <p id="toolStatus" class="tool-status" role="status" hidden></p>
 
       <div id="advancedPanel" style="display: none;">
@@ -187,10 +201,10 @@
             <option value="ping">Ping (CORS proxy)</option>
           </select>
         </label>
-        <label>Popup/Tab behavior:
+        <label>Popup and tab behavior:
           <select id="reuseToggle">
-            <option value="fresh">Open → goto → wait → close</option>
-            <option value="reuse">Reuse same window/tab</option>
+            <option value="fresh">Open, go to page, wait, close</option>
+            <option value="reuse">Reuse same window or tab</option>
           </select>
         </label>
         <label>Max concurrent:
@@ -213,34 +227,44 @@
 
       <div id="shareControls">
         <label class="visually-hidden" for="newUrl" style="position:absolute;left:-9999px;">Shareable URL</label>
-        <input id="newUrl" type="text" readonly placeholder="Shareable URL appears here…">
-        <button id="copyBtn" type="button">Copy</button>
+        <input id="newUrl" type="text" readonly placeholder="Shareable URL appears here">
+        <button id="copyBtn" class="btn btn-secondary" type="button">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          Copy
+        </button>
       </div>
 
-      <button id="downloadBtn" type="button">Download URLs</button>
-      <a id="externalLink" href="#" target="_self" rel="noopener">🔗 Open target</a>
+      <button id="downloadBtn" class="btn btn-tertiary" type="button">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+        Download URLs
+      </button>
+      <a id="externalLink" href="#" target="_self" rel="noopener">Open target</a>
 
       <div id="progressContainer">
-        <div style="background:#ddd; height:20px; border-radius:10px;">
-          <div id="progressBar" style="height:100%; width:0%; background:#4caf50;"></div>
+        <div class="progress-track">
+          <div id="progressBar"></div>
         </div>
         <div id="progressText" aria-live="polite">0/0 (0%)</div>
       </div>
 
-      <!-- Website Screenshot Preview (filled by website-screenshot-preview.js) -->
       <img id="previewwebsite" alt="Website screenshot preview" loading="lazy" referrerpolicy="no-referrer">
 
       <ul id="results" class="results-list" aria-live="polite" aria-label="Generated backlink URLs"></ul>
-      <p class="tool-legend">✔ means the target loaded, ✖ means it timed out or was blocked. A load is not proof that a link was created — check the strongest targets manually.</p>
+      <p class="tool-legend">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--primary);vertical-align:-3px"><path d="M20 6 9 17l-5-5"/></svg>
+        means the target loaded, and
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--faint);vertical-align:-3px"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        means it timed out or was blocked. A load does not prove a link was created. Check the strongest targets manually.
+      </p>
     </div>
 
     <section id="how-it-works">
       <h2>How it works</h2>
       <ol class="steps">
-        <li>You enter one URL. The engine validates it and builds a placeholder map (host, path, query, video ID).</li>
+        <li>You enter one URL. The engine validates it and builds a placeholder map for the host, path, query and video ID.</li>
         <li>Every URL template in the JSON dataset is filled in with your page, so links point at exactly that page.</li>
         <li>The chosen delivery mode opens each target once, waits for it to load, and records whether it did.</li>
-        <li>Copy the shareable link to re-run the same URL later, or download the full list as a text file.</li>
+        <li>Copy the shareable link to run the same URL later, or download the full list as a text file.</li>
       </ol>
     </section>
 
@@ -248,20 +272,256 @@
       <h2>Delivery modes</h2>
       <div class="grid">
         <div class="card">
+          <span class="card-icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+          </span>
           <h3>IFrame</h3>
-          <p>Loads each target in a hidden 1×1 frame. Quietest mode, works without popup permission, and the best default for bulk runs.</p>
+          <p>Loads each target in a hidden 1x1 frame. Quietest mode, works without popup permission, and the best default for bulk runs.</p>
         </div>
         <div class="card">
-          <h3>Popup / Tab</h3>
+          <span class="card-icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg>
+          </span>
+          <h3>Popup and Tab</h3>
           <p>Opens real windows. Use it when an endpoint refuses to load in a frame. Allow pop-ups for this site first.</p>
         </div>
         <div class="card">
+          <span class="card-icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.247 7.761a6 6 0 0 1 0 8.478"/><path d="M19.075 4.933a10 10 0 0 1 0 14.134"/><path d="M4.925 19.067a10 10 0 0 1 0-14.134"/><path d="M7.753 16.239a6 6 0 0 1 0-8.478"/><circle cx="12" cy="12" r="2"/></svg>
+          </span>
           <h3>Ping</h3>
           <p>Requests each URL through a public CORS proxy and records whether it answered. Fast, but a proxy error page still counts as a response.</p>
         </div>
         <div class="card">
+          <span class="card-icon" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+          </span>
           <h3>Archive submissions</h3>
-          <p>Archive endpoints are part of the normal template list: each one asks a snapshot service to fetch the page, which gives crawlers another URL to discover. The Wayback Machine copy is separate and only runs when you tick its box.</p>
+          <p>Archive endpoints are part of the normal template list. Each one asks a snapshot service to fetch the page, which gives crawlers another URL to discover. The Wayback Machine copy is separate and only runs when you tick its box.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="bento-section">
+      <h2>Built for a clean run</h2>
+      <p class="bento-lead">One URL goes in, a full discovery pass comes out. Hover the grid, then click a card to send the light across it.</p>
+
+      <div class="magic-bento" id="runBento" data-columns="4" data-row-height="210" data-gap="12" data-radius="16" data-glow="#00b24b" data-spotlight-radius="300" data-autohide>
+        <div class="magic-bento__cell" data-col-span="2" data-row-span="2">
+          <article class="magic-bento__card">
+            <div class="magic-bento__content">
+              <div class="magic-bento__header">
+                <span class="magic-bento__icon">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg>
+                </span>
+                <span class="magic-bento__label">Delivery</span>
+              </div>
+              <div class="magic-bento__visual" aria-hidden="true">
+                <div class="mb-modes">
+                  <span class="mb-mode" style="--i:0">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+                    IFrame
+                    <span class="mb-mode__dot"></span>
+                  </span>
+                  <span class="mb-mode" style="--i:1">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg>
+                    Popup
+                    <span class="mb-mode__dot"></span>
+                  </span>
+                  <span class="mb-mode" style="--i:2">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/></svg>
+                    Tab
+                    <span class="mb-mode__dot"></span>
+                  </span>
+                  <span class="mb-mode" style="--i:3">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+                    Ping
+                    <span class="mb-mode__dot"></span>
+                  </span>
+                </div>
+              </div>
+              <div class="magic-bento__text">
+                <h3 class="magic-bento__title">Four ways to open a target</h3>
+                <p class="magic-bento__description">IFrame stays quiet. Popup and Tab work around frame blocks. Ping checks reachability through a public proxy, and the mode is yours to pick per run.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="magic-bento__cell" data-col-span="2" data-row-span="2">
+          <article class="magic-bento__card">
+            <div class="magic-bento__content">
+              <div class="magic-bento__header">
+                <span class="magic-bento__icon">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.914 4a1.5 1.5 0 0 0-2.474-1.561l-9 9A1.5 1.5 0 0 0 5.5 14h4.002a.5.5 0 0 1 .471.666L8.086 20a1.5 1.5 0 0 0 2.475 1.56l9-9A1.5 1.5 0 0 0 18.5 10h-3.997a.5.5 0 0 1-.472-.667z"/></svg>
+                </span>
+                <span class="magic-bento__label">Pipeline</span>
+              </div>
+              <div class="magic-bento__visual" aria-hidden="true">
+                <div class="mb-flow">
+                  <div class="mb-flow__trigger">
+                    <span class="mb-flow__glyph">
+                      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    </span>
+                    <span class="mb-flow__copy">
+                      <span class="mb-flow__name">example.com/blog/post</span>
+                      <span class="mb-flow__meta">Target locked</span>
+                    </span>
+                  </div>
+                  <div class="mb-steps">
+                    <span class="mb-steps__rail"><span></span></span>
+                    <span class="mb-step" style="--i:0"><span class="mb-step__dot"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Build the links<span class="mb-step__time">4,400</span></span>
+                    <span class="mb-step" style="--i:1"><span class="mb-step__dot"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Open the targets<span class="mb-step__time">batch</span></span>
+                    <span class="mb-step" style="--i:2"><span class="mb-step__dot"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Check each load<span class="mb-step__time">live</span></span>
+                    <span class="mb-step" style="--i:3"><span class="mb-step__dot"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Export the list<span class="mb-step__time">txt</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="magic-bento__text">
+                <h3 class="magic-bento__title">One URL in, every link out</h3>
+                <p class="magic-bento__description">Every template is filled with your exact page before a single request opens. The run records what loaded, then hands you the list.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="magic-bento__cell" data-col-span="1" data-row-span="1">
+          <article class="magic-bento__card">
+            <div class="magic-bento__content">
+              <div class="magic-bento__header">
+                <span class="magic-bento__icon">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </span>
+                <span class="magic-bento__label">Coverage</span>
+              </div>
+              <div class="magic-bento__visual" aria-hidden="true">
+                <div class="mb-bars">
+                  <div class="mb-figure">
+                    <span class="mb-figure__value">4,400</span>
+                    <span class="mb-figure__note">requests</span>
+                  </div>
+                  <div class="mb-bars__plot">
+                    <span class="mb-bar" style="--h:.42;--i:0"></span>
+                    <span class="mb-bar" style="--h:.58;--i:1"></span>
+                    <span class="mb-bar" style="--h:.49;--i:2"></span>
+                    <span class="mb-bar" style="--h:.71;--i:3"></span>
+                    <span class="mb-bar" style="--h:.63;--i:4"></span>
+                    <span class="mb-bar" style="--h:.88;--i:5" data-peak></span>
+                    <span class="mb-bar" style="--h:.76;--i:6"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="magic-bento__text">
+                <h3 class="magic-bento__title">2,700+ target hosts</h3>
+                <p class="magic-bento__description">Backlink, ping, share and archive endpoints in one list.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="magic-bento__cell" data-col-span="1" data-row-span="1">
+          <article class="magic-bento__card">
+            <div class="magic-bento__content">
+              <div class="magic-bento__header">
+                <span class="magic-bento__icon">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </span>
+                <span class="magic-bento__label">Discovery</span>
+              </div>
+              <div class="magic-bento__visual" aria-hidden="true">
+                <div class="mb-chart">
+                  <div class="mb-figure">
+                    <span class="mb-figure__value">4.4k</span>
+                    <span class="mb-figure__note">pings</span>
+                  </div>
+                  <div class="mb-chart__plot">
+                    <svg viewBox="0 0 220 60" preserveAspectRatio="none">
+                      <path class="mb-chart__area" d="M2,50 L20,46 L38,48 L56,38 L74,41 L92,30 L110,34 L128,24 L146,27 L164,16 L182,19 L200,8 L218,4 L218,60 L2,60 Z"/>
+                      <path class="mb-chart__line" d="M2,50 L20,46 L38,48 L56,38 L74,41 L92,30 L110,34 L128,24 L146,27 L164,16 L182,19 L200,8 L218,4" pathLength="1"/>
+                      <circle class="mb-chart__dot" cx="218" cy="4" r="2.4"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="magic-bento__text">
+                <h3 class="magic-bento__title">Fresh crawl signals</h3>
+                <p class="magic-bento__description">Pings and archives give crawlers another path to the page.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="magic-bento__cell" data-col-span="1" data-row-span="1">
+          <article class="magic-bento__card">
+            <div class="magic-bento__content">
+              <div class="magic-bento__header">
+                <span class="magic-bento__icon">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                </span>
+                <span class="magic-bento__label">Privacy</span>
+              </div>
+              <div class="magic-bento__visual" aria-hidden="true">
+                <div class="mb-settings">
+                  <div class="mb-setting" style="--i:0">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+                    No account
+                    <span class="mb-switch"></span>
+                  </div>
+                  <div class="mb-setting" style="--i:1">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
+                    No tracking
+                    <span class="mb-switch"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="magic-bento__text">
+                <h3 class="magic-bento__title">Runs in your browser</h3>
+                <p class="magic-bento__description">Static files, no server storage, no account to create.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="magic-bento__cell" data-col-span="1" data-row-span="1">
+          <article class="magic-bento__card">
+            <div class="magic-bento__content">
+              <div class="magic-bento__header">
+                <span class="magic-bento__icon">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+                </span>
+                <span class="magic-bento__label">Export</span>
+              </div>
+              <div class="magic-bento__visual" aria-hidden="true">
+                <div class="mb-hub">
+                  <svg class="mb-hub__links" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <line x1="18" y1="22" x2="50" y2="50" pathLength="1"/>
+                    <line x1="82" y1="22" x2="50" y2="50" pathLength="1"/>
+                    <line x1="18" y1="78" x2="50" y2="50" pathLength="1"/>
+                    <line x1="82" y1="78" x2="50" y2="50" pathLength="1"/>
+                  </svg>
+                  <span class="mb-hub__node" style="--x:18%;--y:22%;--i:1">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                  </span>
+                  <span class="mb-hub__node" style="--x:82%;--y:22%;--i:2">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                  </span>
+                  <span class="mb-hub__node" style="--x:18%;--y:78%;--i:3">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+                  </span>
+                  <span class="mb-hub__node" style="--x:82%;--y:78%;--i:4">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+                  </span>
+                  <span class="mb-hub__node mb-hub__node--center" style="--x:50%;--y:50%;--i:0">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  </span>
+                </div>
+              </div>
+              <div class="magic-bento__text">
+                <h3 class="magic-bento__title">Copy, share, download</h3>
+                <p class="magic-bento__description">A shareable run link plus a plain text list of every URL.</p>
+              </div>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -270,28 +530,104 @@
       <h2>Frequently asked questions</h2>
       <details class="faq">
         <summary>Is this really free, and do I need an account?</summary>
-        <p>Yes — free, no account. The engine, the templates and the export are all static files served to your browser.</p>
+        <p>Yes. Free, no account. The engine, the templates and the export are all static files served to your browser.</p>
       </details>
       <details class="faq">
         <summary>Do these submissions count as real backlinks?</summary>
-        <p>Most are index-discovery and ping signals: they help crawlers find a URL faster. Treat them as a discovery helper, not a replacement for editorial links.</p>
+        <p>Most are index-discovery and ping signals. They help crawlers find a URL faster. Treat them as a discovery helper, not a replacement for editorial links.</p>
       </details>
       <details class="faq">
-        <summary>Why do some targets show ✖?</summary>
+        <summary>Why do some targets show a cross?</summary>
         <p>Endpoints rate-limit, block frames or sit behind a redirect chain. Lower concurrency, shuffle templates, or run again later.</p>
       </details>
       <details class="faq">
         <summary>What data leaves my browser?</summary>
-        <p>Only the requests the tool opens: the generated backlink URLs, the optional thum.io preview of the URL you typed, and — only if you tick the box — a Wayback Machine submission.</p>
+        <p>Only the requests the tool opens: the generated backlink URLs, the optional thum.io preview of the URL you typed, and, only if you tick the box, a Wayback Machine submission.</p>
       </details>
     </section>
   </main>
 
-  <footer class="site-footer bgt-footer">
-    <div class="inner">
-      <p>Backlink Generator Tool · free, client-side SEO utility.</p>
-      <p>Enhanced by <a href="https://f9xr.org" target="_blank" rel="noopener">F9XR Team</a></p>
-      <p><a href="./demo/">Browse the demo pages</a></p>
+  <footer class="site-footer site-footer--wide">
+    <div class="footer-shell">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a class="footer-brand__link" href="./index.html">
+            <span class="footer-brand__mark" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </span>
+            <span class="footer-brand__name">Backlink Generator</span>
+          </a>
+          <p class="footer-brand__note">One URL in, thousands of backlink, ping and archive endpoints out. Free, client-side and account free.</p>
+          <p class="footer-credit">3D icons by <a href="https://thiings.co" target="_blank" rel="noopener">Thiings</a></p>
+        </div>
+
+        <nav class="footer-links" aria-label="Footer">
+          <div class="footer-col">
+            <h2 class="footer-col__title">Tool</h2>
+            <ul>
+              <li><a href="#tool">Generator</a></li>
+              <li><a href="#how-it-works">How it works</a></li>
+              <li><a href="#modes">Delivery modes</a></li>
+              <li><a href="#features">Features</a></li>
+              <li><a href="#faq">FAQ</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h2 class="footer-col__title">Resources</h2>
+            <ul>
+              <li><a href="./demo/">Demo library</a></li>
+              <li><a href="./backlink-templates.json">Backlink templates</a></li>
+              <li><a href="./youtube-backlink-templates.json">YouTube templates</a></li>
+              <li><a href="./sitemap.xml">Sitemap</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h2 class="footer-col__title">Project</h2>
+            <ul>
+              <li><a href="https://f9xr.org" target="_blank" rel="noopener">F9XR Team</a></li>
+              <li><a href="https://thiings.co" target="_blank" rel="noopener">Thiings icons</a></li>
+              <li><a href="mailto:backlink.generator.tool@gmail.com">Contact</a></li>
+              <li><a href="./LICENSE">License</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <div class="footer-share">
+        <p class="footer-share__label">Share this tool</p>
+        <ul class="footer-social">
+          <li>
+            <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fbacklink.is-an.ai%2F&amp;text=Free%20backlink%20generator%20with%204%2C400%2B%20endpoints" target="_blank" rel="noopener" aria-label="Share on X">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" fill-rule="evenodd" aria-hidden="true"><path d="M18.9 2h3.05l-6.66 7.61L23.1 22h-6.13l-4.8-6.28L6.68 22H3.62l7.13-8.15L1.9 2h6.29l4.34 5.74L18.9 2zm-1.07 18.05h1.69L7.24 3.85H5.43l12.4 16.2z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fbacklink.is-an.ai%2F" target="_blank" rel="noopener" aria-label="Share on LinkedIn">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M6.94 5a2 2 0 1 1-4-.01 2 2 0 0 1 4 .01zM7 8.48H3V21h4V8.48zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-3.96 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.68-2.91v-1.68z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fbacklink.is-an.ai%2F" target="_blank" rel="noopener" aria-label="Share on Facebook">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a href="mailto:?subject=Backlink%20Generator%20Tool&amp;body=https%3A%2F%2Fbacklink.is-an.ai%2F" aria-label="Share by email">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="footer-bar">
+        <p>&copy; 2026 Backlink Generator Tool</p>
+        <p class="footer-status">Runs in your browser</p>
+        <p>Enhanced by <a href="https://f9xr.org" target="_blank" rel="noopener">F9XR Team</a></p>
+      </div>
+
+      <div class="footer-wordmark" aria-hidden="true">
+        <span class="footer-wordmark__text">Backlink Generator</span>
+      </div>
     </div>
   </footer>
 
@@ -301,5 +637,7 @@
 
   <script src="./backlink-generator.js"></script>
   <script src="./website-screenshot-preview.js"></script>
+  <script src="./pill-nav.js"></script>
+  <script src="./magic-bento.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-// backlink-generator.js — v7.2
+// backlink-generator.js - v7.2
 // Client-side backlink / index-booster engine. No dependencies, no backend.
 //
 // v7.2: placeholder filling is explicit: a bare [URL] / {{URL}} is inserted
@@ -40,6 +40,15 @@ const TASK_TIMEOUT = 8000;
 const PING_TIMEOUT = 5000;
 const RERUN_DELAY = 2000;
 const WAYBACK_TEMPLATE = 'https://web.archive.org/save/[URL]';
+
+// Inline Lucide icons (ISC licence, no attribution required).
+const ICON_ATTRS = 'class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+const ICONS = {
+  check: '<svg ' + ICON_ATTRS + '><path d="M20 6 9 17l-5-5"/></svg>',
+  x: '<svg ' + ICON_ATTRS + '><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+  loader: '<svg ' + ICON_ATTRS.replace('class="icon"', 'class="icon icon-spin"') + '><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+  external: '<svg ' + ICON_ATTRS + '><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>'
+};
 
 // Two-label public suffixes we can handle offline. Longest match wins.
 const MULTI_PART_SUFFIXES = new Set([
@@ -457,7 +466,11 @@ function setExternalLink(text, href) {
   try {
     host = new URL(href).hostname;
   } catch (e) { /* keep as-is */ }
-  link.textContent = '\uD83D\uDD17 ' + text + ' \u2192 ' + host;
+  const label = text + ' ' + host;
+  link.innerHTML = ICONS.external + '<span class="link-label"></span>';
+  const labelEl = link.querySelector('.link-label');
+  if (labelEl) labelEl.textContent = label;
+  else link.textContent = label;
 }
 
 /* ------------------------------------------------------------------ *
@@ -478,7 +491,7 @@ function appendResult(url) {
   }
   const status = document.createElement('span');
   status.className = 'status loading';
-  status.textContent = '\u23F3';
+  status.innerHTML = ICONS.loader;
   status.setAttribute('role', 'img');
   status.setAttribute('aria-label', 'pending');
 
@@ -490,7 +503,7 @@ function appendResult(url) {
 
 function markStatus(status, ok) {
   if (!status) return;
-  status.textContent = ok ? '\u2714\uFE0F' : '\u2716\uFE0F';
+  status.innerHTML = ok ? ICONS.check : ICONS.x;
   status.className = 'status ' + (ok ? 'success' : 'failure');
   status.setAttribute('aria-label', ok ? 'loaded' : 'did not load');
   status.title = ok
@@ -504,7 +517,7 @@ function updateProgress() {
   const pct = totalTasks ? Math.round((doneCount / totalTasks) * 100) : 0;
   if (bar) bar.style.width = pct + '%';
   if (text) {
-    text.textContent = doneCount + '/' + totalTasks + ' (' + pct + '%) \u00B7 \u2714 ' + okCount + ' \u00B7 \u2716 ' + failCount;
+    text.textContent = doneCount + '/' + totalTasks + ' (' + pct + '%) \u00B7 ' + okCount + ' ok \u00B7 ' + failCount + ' failed';
   }
 }
 

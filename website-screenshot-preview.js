@@ -1,4 +1,4 @@
-// website-screenshot-preview.js — v2.0
+// website-screenshot-preview.js - v2.0
 // Live thumbnail of the URL currently in the input box.
 // Privacy/safety notes:
 //  - The URL is sent to image.thum.io only after a short pause in typing (not on every keystroke),

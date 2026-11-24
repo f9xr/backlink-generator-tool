@@ -74,7 +74,7 @@ const demoIndex = `<!DOCTYPE html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Backlink Generator Demo Pages — ${pages.length} Keyword Variants</title>
+  <title>Backlink Generator Demo Pages - ${pages.length} Keyword Variants</title>
   <meta name="description" content="Browse all ${pages.length} demo pages of the free Backlink Generator Tool: one keyword-focused landing page per SEO use case, each running the same client-side engine.">
   <link rel="canonical" href="${SITE}/demo/">
   <meta name="robots" content="index,follow,max-image-preview:large">
@@ -111,7 +111,7 @@ ${listHtml}
   </main>
   <footer class="bgt-footer">
     <div class="inner">
-      <p>Backlink Generator Tool — free, client-side SEO utility.</p>
+      <p>Backlink Generator Tool - free, client-side SEO utility.</p>
       <p>Enhanced by <a href="https://f9xr.org" target="_blank" rel="noopener">F9XR Team</a></p>
     </div>
   </footer>

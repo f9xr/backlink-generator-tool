@@ -82,7 +82,7 @@ setTimeout(() => {
   const progress = store.progressText.textContent;
   let failures = 0;
   const check = (name, cond, detail) => {
-    if (!cond) { failures++; console.log('FAIL ' + name + (detail ? ' — ' + detail : '')); }
+    if (!cond) { failures++; console.log('FAIL ' + name + (detail ? ' - ' + detail : '')); }
     else console.log('PASS ' + name);
   };
 
