@@ -82,6 +82,9 @@
       var label = item.textContent.replace(/\s+/g, ' ').trim();
       var icon = item.querySelector('svg');
       var current = item.getAttribute('aria-current') === 'page';
+      var mod = Array.prototype.filter.call(item.classList, function (name) {
+        return name !== 'pill-nav__item';
+      }).join(' ');
 
       var face = document.createElement('span');
       face.className = 'pill-nav__face';
@@ -108,6 +111,7 @@
       self.items.push({
         label: label,
         href: item.getAttribute('href'),
+        mod: mod,
         icon: icon ? icon.cloneNode(true) : null
       });
     });
@@ -120,7 +124,7 @@
 
     this.items.forEach(function (item) {
       var cell = document.createElement('span');
-      cell.className = 'pill-nav__measure-item';
+      cell.className = 'pill-nav__measure-item' + (item.mod ? ' ' + item.mod : '');
       if (item.icon) cell.appendChild(item.icon.cloneNode(true));
       var text = document.createElement('span');
       text.textContent = item.label;
