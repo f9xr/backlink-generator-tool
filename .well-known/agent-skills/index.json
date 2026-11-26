@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "backlink-generator",
+      "type": "skill-md",
+      "description": "Build and open a backlink, ping and archive submission list for one page URL with the free client-side generator at backlink.is-an.ai.",
+      "url": "https://backlink.is-an.ai/.well-known/agent-skills/backlink-generator/SKILL.md",
+      "digest": "sha256:57cf7b76f3ddd5d60f63c771c68da50d5bf1511df10732b68690526ee3fa81a1"
+    }
+  ]
+}

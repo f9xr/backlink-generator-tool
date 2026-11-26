@@ -80,6 +80,7 @@ for (const file of pages) {
   if ((html.match(/<h1[\s>]/gi) || []).length > 1) fail('more than one h1');
   if (html.includes('backlink-generator-tool.github.io')) fail('absolute github.io asset URL');
   if (!html.includes('f9xr.org')) fail('missing F9XR footer credit');
+  if (!/<meta name="robots" content="noindex[^"]*"/i.test(html)) fail('retired demo page must be noindex');
 
   const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
   const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
@@ -92,19 +93,87 @@ for (const file of pages) {
 }
 
 // ---------- required files ----------
-for (const file of ['robots.txt', 'sitemap.xml', '404.html', 'demo/index.html', 'LICENSE', '.gitignore', 'index.html']) {
+const CORE_PAGES = [
+  'index.html',
+  '404.html',
+  'how-it-works.html',
+  'report-problem.html',
+  'pages/sitemap.html',
+  'pages/terms.html',
+  'pages/privacy.html',
+  'pages/refund.html',
+  'pages/affiliate-disclosure.html',
+  'pages/transparency.html',
+  'pages/dmca.html'
+];
+
+for (const file of ['robots.txt', 'sitemap.xml', 'all-urls.txt', 'ads.txt', 'LICENSE', '.gitignore', 'demo/index.html', 'assets/og-image.png'].concat(CORE_PAGES)) {
   if (!fs.existsSync(path.join(ROOT, file))) errors.push('missing ' + file);
+}
+
+// ---------- core pages ----------
+for (const file of CORE_PAGES) {
+  const full = path.join(ROOT, file);
+  if (!fs.existsSync(full)) continue;
+  const html = fs.readFileSync(full, 'utf8');
+  const fail = message => errors.push(file + ': ' + message);
+
+  if (!/<html[^>]*\slang="en"/i.test(html)) fail('missing html lang');
+  if (!/<meta charset="utf-8">/i.test(html)) fail('missing charset');
+  if (!/<meta name="viewport"/i.test(html)) fail('missing viewport');
+  if (!/<meta name="description" content="[^"]{60,}"/i.test(html)) fail('missing or short description');
+  if (!/<link rel="canonical"/i.test(html)) fail('missing canonical');
+  if (!/<meta name="robots"/i.test(html)) fail('missing robots meta');
+  if (file !== '404.html') {
+    if (!/<meta property="og:image" content="https:\/\/backlink\.is-an\.ai\/assets\/free-backlink-generator-tool-og\.jpg">/i.test(html)) fail('missing og:image social card');
+    if (!/<meta property="og:image:alt"/i.test(html)) fail('missing og:image:alt');
+    if (!/<meta name="twitter:card" content="summary_large_image">/i.test(html)) fail('twitter card is not summary_large_image');
+    if (!/<meta name="twitter:image"/i.test(html)) fail('missing twitter:image');
+  }
+  if (!/<h1[\s>]/i.test(html)) fail('missing h1');
+  if ((html.match(/<h1[\s>]/gi) || []).length > 1) fail('more than one h1');
+  if (/href="(?:\.\/|\/)?demo\//i.test(html)) fail('links to the retired demo library');
+  if (html.includes('backlink.generator.tool@gmail.com')) fail('old contact email');
+  if (!html.includes('hello@f9xr.org')) fail('missing hello@f9xr.org contact');
+
+  const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
+  const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+  if (dupes.length) fail('duplicate ids: ' + [...new Set(dupes)].slice(0, 5).join(', '));
+
+  for (const block of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    try {
+      JSON.parse(block[1]);
+    } catch (e) {
+      fail('invalid JSON-LD: ' + e.message);
+    }
+  }
 }
 
 if (fs.existsSync(path.join(ROOT, 'sitemap.xml'))) {
   const sitemap = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');
   const locs = new Set([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]));
-  for (const file of pages) {
-    if (!locs.has('https://backlink.is-an.ai/demo/' + file)) {
-      errors.push('sitemap.xml: missing demo/' + file);
-      break;
-    }
+  if ([...locs].some(loc => loc.includes('/demo/'))) errors.push('sitemap.xml: still lists /demo/ pages');
+  const required = [
+    'https://backlink.is-an.ai/',
+    'https://backlink.is-an.ai/how-it-works.html',
+    'https://backlink.is-an.ai/report-problem.html',
+    'https://backlink.is-an.ai/pages/privacy.html'
+  ];
+  for (const loc of required) {
+    if (!locs.has(loc)) errors.push('sitemap.xml: missing ' + loc);
   }
+}
+
+if (fs.existsSync(path.join(ROOT, 'all-urls.txt'))) {
+  const allUrls = fs.readFileSync(path.join(ROOT, 'all-urls.txt'), 'utf8')
+    .split(/\r?\n/)
+    .filter(line => line.trim() && !line.trim().startsWith('#'))
+    .join('\n');
+  for (const file of ['', 'how-it-works.html', 'report-problem.html', 'pages/privacy.html']) {
+    const url = 'https://backlink.is-an.ai/' + file;
+    if (!allUrls.includes(url)) errors.push('all-urls.txt: missing ' + url);
+  }
+  if (allUrls.includes('/demo/')) errors.push('all-urls.txt: still lists /demo/ pages');
 }
 
 for (const warning of warnings) console.log('WARN ' + warning);

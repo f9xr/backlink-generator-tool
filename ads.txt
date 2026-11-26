@@ -1,0 +1,7 @@
+# ads.txt for backlink.is-an.ai
+#
+# Google AdSense is not active yet. After approval, replace the commented
+# placeholder below with the exact line Google gives you in AdSense, then
+# remove the leading #. The publisher ID must be your real ca-pub value.
+#
+# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

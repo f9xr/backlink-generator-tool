@@ -47,8 +47,27 @@ const ICONS = {
   check: '<svg ' + ICON_ATTRS + '><path d="M20 6 9 17l-5-5"/></svg>',
   x: '<svg ' + ICON_ATTRS + '><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
   loader: '<svg ' + ICON_ATTRS.replace('class="icon"', 'class="icon icon-spin"') + '><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
-  external: '<svg ' + ICON_ATTRS + '><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>'
+  external: '<svg ' + ICON_ATTRS + '><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
+  stop: '<svg ' + ICON_ATTRS + '><rect width="14" height="14" x="5" y="5" rx="2"/></svg>',
+  start: '<svg ' + ICON_ATTRS + '><path d="M15.914 4a1.5 1.5 0 0 0-2.474-1.561l-9 9A1.5 1.5 0 0 0 5.5 14h4.002a.5.5 0 0 1 .471.666L8.086 20a1.5 1.5 0 0 0 2.475 1.56l9-9A1.5 1.5 0 0 0 18.5 10h-3.997a.5.5 0 0 1-.472-.667z"/></svg>'
 };
+
+const BUTTON_LABELS = {
+  start: 'Generate Backlinks',
+  stop: 'Stop run'
+};
+
+function setStartButton(isRunning) {
+  const button = el('startBtn');
+  if (!button) return;
+  const label = isRunning ? BUTTON_LABELS.stop : BUTTON_LABELS.start;
+  const span = button.querySelector ? button.querySelector('.btn-label') : null;
+  if (span) span.textContent = label;
+  else button.textContent = label;
+  button.setAttribute('aria-pressed', isRunning ? 'true' : 'false');
+  const icon = button.querySelector ? button.querySelector('.btn-icon-swap') : null;
+  if (icon) icon.innerHTML = isRunning ? ICONS.stop : ICONS.start;
+}
 
 // Two-label public suffixes we can handle offline. Longest match wins.
 const MULTI_PART_SUFFIXES = new Set([
@@ -827,16 +846,14 @@ function startRun(isRerun) {
     token: thisToken
   }));
 
-  const startBtn = el('startBtn');
-  if (startBtn) startBtn.textContent = 'Stop';
+  setStartButton(true);
   slots.forEach(s => launchSlot(s));
 }
 
 function finishRun() {
   if (!running) return;
   running = false;
-  const startBtn = el('startBtn');
-  if (startBtn) startBtn.textContent = 'Generate Backlinks';
+  setStartButton(false);
   slots.forEach(s => {
     if (s.ref) closeWindow(s.ref);
     if (s.timeoutId) clearTimeout(s.timeoutId);
@@ -853,8 +870,7 @@ function stopRun() {
   running = false;
   runToken += 1; // invalidate stale callbacks
   queue = [];
-  const startBtn = el('startBtn');
-  if (startBtn) startBtn.textContent = 'Generate Backlinks';
+  setStartButton(false);
   if (rerunTimer) {
     clearTimeout(rerunTimer);
     rerunTimer = null;
@@ -895,14 +911,216 @@ function downloadUrls() {
       .filter(Boolean);
   }
 
-  const blob = new Blob([urls.join('\n')], { type: 'text/plain;charset=utf-8' });
+  if (!urls.length) {
+    showNotice('There is no link list to download yet. Run the generator first.', 'warn');
+    return;
+  }
+
+  const base = 'backlinks-' + (new URL(norm).hostname || 'list');
+  return { urls: urls, base: base, target: norm };
+}
+
+function saveBlob(blob, filename) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'backlinks-' + (new URL(norm).hostname || 'list') + '.txt';
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function downloadText() {
+  const data = downloadUrls();
+  if (!data) return;
+  const header = '# Backlink list for ' + data.target + '\n' +
+    '# Generated ' + new Date().toISOString() + '\n' +
+    '# ' + data.urls.length + ' URLs\n\n';
+  saveBlob(new Blob([header + data.urls.join('\n') + '\n'], { type: 'text/plain;charset=utf-8' }), data.base + '.txt');
+}
+
+function csvCell(value) {
+  return '"' + String(value).replace(/"/g, '""') + '"';
+}
+
+function downloadCsv() {
+  const data = downloadUrls();
+  if (!data) return;
+  const rows = [['#', 'Backlink URL', 'Target page']];
+  data.urls.forEach((url, i) => rows.push([i + 1, url, data.target]));
+  const csv = rows.map(row => row.map(csvCell).join(',')).join('\r\n');
+  saveBlob(new Blob(['\uFEFF' + csv + '\r\n'], { type: 'text/csv;charset=utf-8' }), data.base + '.csv');
+}
+
+function xmlEscape(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Excel 2003 XML opens natively in Excel, LibreOffice and Sheets, and keeps
+// every URL intact as text. No zip writer or external library is needed.
+function downloadExcel() {
+  const data = downloadUrls();
+  if (!data) return;
+  const rows = data.urls.map((url, i) =>
+    '<Row><Cell><Data ss:Type="Number">' + (i + 1) + '</Data></Cell>' +
+    '<Cell><Data ss:Type="String">' + xmlEscape(url) + '</Data></Cell>' +
+    '<Cell><Data ss:Type="String">' + xmlEscape(data.target) + '</Data></Cell></Row>'
+  ).join('');
+  const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<?mso-application progid="Excel.Sheet"?>\n' +
+    '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" ' +
+    'xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' +
+    '<Worksheet ss:Name="Backlinks"><Table>' +
+    '<Row><Cell><Data ss:Type="String">#</Data></Cell>' +
+    '<Cell><Data ss:Type="String">Backlink URL</Data></Cell>' +
+    '<Cell><Data ss:Type="String">Target page</Data></Cell></Row>' +
+    rows + '</Table></Worksheet></Workbook>';
+  saveBlob(new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8' }), data.base + '.xls');
+}
+
+function pdfEscape(value) {
+  return String(value)
+    .replace(/[^\x20-\x7E]/g, '?')
+    .replace(/\\/g, '\\\\')
+    .replace(/\(/g, '\\(')
+    .replace(/\)/g, '\\)');
+}
+
+function downloadPdf() {
+  const data = downloadUrls();
+  if (!data) return;
+
+  // A4 page, Helvetica 7.5pt, wrapped at 112 characters. Built by hand so the
+  // download stays dependency free.
+  const pageWidth = 595.28;
+  const pageHeight = 841.89;
+  const margin = 42;
+  const lineHeight = 10;
+  const maxLines = 72;
+  const chars = 112;
+  const lines = [];
+  lines.push('Backlink list for ' + pdfEscape(data.target));
+  lines.push('Generated ' + new Date().toISOString().slice(0, 10) + ' / ' + data.urls.length + ' URLs');
+  lines.push('');
+  data.urls.forEach((url, i) => {
+    const prefix = String(i + 1) + '. ';
+    const body = pdfEscape(url);
+    let rest = body;
+    lines.push(prefix + rest.slice(0, chars - prefix.length));
+    rest = rest.slice(chars - prefix.length);
+    while (rest) {
+      lines.push('   ' + rest.slice(0, chars - 3));
+      rest = rest.slice(chars - 3);
+    }
+  });
+
+  const pages = [];
+  for (let start = 0; start < lines.length; start += maxLines) {
+    pages.push(lines.slice(start, start + maxLines));
+  }
+
+  const objects = [];
+  objects.push('<< /Type /Catalog /Pages 2 0 R >>');
+  const kids = pages.map((_, i) => (3 + i * 2) + ' 0 R').join(' ');
+  objects.push('<< /Type /Pages /Kids [' + kids + '] /Count ' + pages.length + ' >>');
+  pages.forEach((pageLines, i) => {
+    const content = 'BT /F1 7.5 Tf ' + lineHeight + ' TL ' + margin + ' ' +
+      (pageHeight - margin) + ' Td\n' +
+      pageLines.map(line => '(' + line + ') Tj T*').join('\n') +
+      '\nET';
+    const contentObj = 4 + i * 2;
+    objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pageWidth + ' ' + pageHeight + '] ' +
+      '/Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> ' +
+      '/Contents ' + contentObj + ' 0 R >>');
+    objects.push('<< /Length ' + content.length + ' >>\nstream\n' + content + '\nendstream');
+  });
+
+  let pdf = '%PDF-1.4\n';
+  const offsets = [0];
+  objects.forEach((body, i) => {
+    offsets.push(pdf.length);
+    pdf += (i + 1) + ' 0 obj\n' + body + '\nendobj\n';
+  });
+  const xrefAt = pdf.length;
+  pdf += 'xref\n0 ' + (objects.length + 1) + '\n0000000000 65535 f \n';
+  for (let i = 1; i < offsets.length; i++) {
+    pdf += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+  }
+  pdf += 'trailer\n<< /Size ' + (objects.length + 1) + ' /Root 1 0 R >>\nstartxref\n' + xrefAt + '\n%%EOF';
+
+  const bytes = new Uint8Array(pdf.length);
+  for (let i = 0; i < pdf.length; i++) bytes[i] = pdf.charCodeAt(i) & 0xff;
+  saveBlob(new Blob([bytes], { type: 'application/pdf' }), data.base + '.pdf');
+}
+
+/* ------------------------------------------------------------------ *
+ * Live URL feedback and counters
+ * ------------------------------------------------------------------ */
+function updateUrlHint() {
+  const hint = el('urlHint');
+  if (!hint) return;
+  const input = el('urlInput');
+  const raw = input ? input.value.trim() : '';
+  hint.className = '';
+  hint.textContent = '';
+
+  if (!raw) {
+    hint.className = '';
+    hint.textContent = 'Paste the exact page you want links for.';
+    return;
+  }
+
+  const norm = normalizeUrl(raw);
+  if (!norm) {
+    hint.className = 'is-invalid';
+    hint.textContent = 'That does not look like a valid http(s) URL yet.';
+    return;
+  }
+
+  const target = new URL(norm);
+  const count = templatesFor(videoIdOf(norm)).length;
+  hint.className = 'is-valid';
+  hint.textContent = 'Ready: ' + target.hostname + (target.pathname === '/' ? '' : target.pathname) +
+    ' / ' + count.toLocaleString() + ' generated URLs.';
+}
+
+// Public claims are floored to the nearest hundred so a badge can never promise
+// more than the loaded templates actually contain, and stays in step with the
+// "4,500+" figure used in the copy, schema and meta tags.
+function roundedCount(value) {
+  return Math.floor(value / 100) * 100;
+}
+
+function updateCounters() {
+  if (typeof document.querySelectorAll !== 'function') return;
+  const total = roundedCount(backlinkTemplates.length + youtubeBacklinkTemplates.length);
+  document.querySelectorAll('[data-endpoint-count]').forEach(node => {
+    node.textContent = total.toLocaleString() + '+ endpoints';
+  });
+  document.querySelectorAll('[data-host-count]').forEach(node => {
+    const hosts = new Set();
+    backlinkTemplates.concat(youtubeBacklinkTemplates).forEach(tpl => {
+      try { hosts.add(new URL(tpl).hostname); } catch (e) { /* skip malformed */ }
+    });
+    node.textContent = roundedCount(hosts.size).toLocaleString() + '+ target hosts';
+  });
+}
+
+function wireDownloadButtons() {
+  const handlers = {
+    downloadTxt: downloadText,
+    downloadCsv: downloadCsv,
+    downloadExcel: downloadExcel,
+    downloadPdf: downloadPdf
+  };
+  Object.keys(handlers).forEach(id => {
+    const node = el(id);
+    if (node) node.addEventListener('click', handlers[id]);
+  });
 }
 
 async function copyShareUrl() {
@@ -949,6 +1167,7 @@ async function boot() {
   const advancedPanel = el('advancedPanel');
   const copyBtn = el('copyBtn');
   const downloadBtn = el('downloadBtn');
+  const urlHint = el('urlHint');
   const reuseToggle = el('reuseToggle');
   const rerunCheckbox = el('rerunCheckbox');
   const shuffleCheckbox = el('shuffleCheckbox');
@@ -987,7 +1206,7 @@ async function boot() {
       const open = advancedPanel.style.display === 'none';
       advancedPanel.style.display = open ? 'block' : 'none';
       toggleAdvancedBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      toggleAdvancedBtn.textContent = open ? '\u2699\uFE0F Advanced \u25B2' : '\u2699\uFE0F Advanced \u25BC';
+      toggleAdvancedBtn.classList.toggle('is-open', open);
     });
   }
 
@@ -1007,17 +1226,22 @@ async function boot() {
     });
     urlInput.addEventListener('input', function () {
       urlInput.removeAttribute('aria-invalid');
+      updateUrlHint();
     });
   }
+  if (urlHint) updateUrlHint();
 
   if (copyBtn) copyBtn.addEventListener('click', copyShareUrl);
-  if (downloadBtn) downloadBtn.addEventListener('click', downloadUrls);
+  if (downloadBtn) downloadBtn.setAttribute('aria-expanded', 'false');
+  wireDownloadButtons();
   if (externalLink) externalLink.style.display = 'none';
 
   if (progressBar) progressBar.style.width = '0%';
   if (progressText) progressText.textContent = '0/0 (0%)';
 
   await loadTemplates();
+  updateCounters();
+  updateUrlHint();
 
   const fromQuery = getUrlFromQuery(location.search);
   if (fromQuery) {
@@ -1039,6 +1263,12 @@ window.BacklinkGenerator = {
   generateUrl: generateUrl,
   buildMap: buildMap,
   loadTemplates: loadTemplates,
+  download: {
+    txt: downloadText,
+    csv: downloadCsv,
+    excel: downloadExcel,
+    pdf: downloadPdf
+  },
   start: function () { startRun(false); },
   stop: stopRun,
   archiveTargetUrl: archiveTargetUrl

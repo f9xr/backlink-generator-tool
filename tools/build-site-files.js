@@ -1,7 +1,7 @@
 // tools/build-site-files.js
-// Generates sitemap.xml, robots.txt and demo/index.html from the current demo
-// page list. Run after adding or renaming a demo page. 404.html is a hand-
-// maintained static page, so this script does not overwrite it.
+// Generates sitemap.xml, robots.txt and the archived demo/index.html.
+// The /demo/ library is retired: demo pages are noindexed and are deliberately
+// excluded from the sitemap. Edit CORE_PAGES when a public page is added.
 //
 // Usage: node tools/build-site-files.js
 'use strict';
@@ -12,7 +12,19 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const DEMO = path.join(ROOT, 'demo');
 const SITE = 'https://backlink.is-an.ai';
-const LAST_MOD = '2026-11-23';
+const LAST_MOD = '2026-11-24';
+const CORE_PAGES = [
+  ['/', '1.0', 'weekly'],
+  ['/how-it-works.html', '0.9', 'monthly'],
+  ['/report-problem.html', '0.5', 'monthly'],
+  ['/pages/sitemap.html', '0.4', 'monthly'],
+  ['/pages/terms.html', '0.3', 'yearly'],
+  ['/pages/privacy.html', '0.3', 'yearly'],
+  ['/pages/refund.html', '0.2', 'yearly'],
+  ['/pages/affiliate-disclosure.html', '0.2', 'yearly'],
+  ['/pages/transparency.html', '0.3', 'yearly'],
+  ['/pages/dmca.html', '0.2', 'yearly']
+];
 
 const ACRONYMS = new Set(['seo', 'ai', 'csv', 'faq', 'url', 'api', 'serp', 'html', 'ppc', 'sem', 'roi']);
 const keywordFromSlug = file => file.replace(/\.html$/, '').split('-').map(w => {
@@ -28,14 +40,14 @@ const escapeHtml = v => String(v)
 const pages = fs.readdirSync(DEMO).filter(f => f.endsWith('.html') && f !== 'index.html').sort();
 
 // ---------- sitemap ----------
-// Search engines ignore <priority>/<changefreq>, so only <loc> and <lastmod> are emitted.
-const entries = [SITE + '/', SITE + '/demo/'].concat(pages.map(f => SITE + '/demo/' + f));
+const entries = CORE_PAGES.map(page => SITE + page[0]);
 
 const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-  ...entries.map(loc =>
-    '  <url>\n    <loc>' + loc + '</loc>\n    <lastmod>' + LAST_MOD + '</lastmod>\n  </url>'
+  ...CORE_PAGES.map(page =>
+    '  <url>\n    <loc>' + SITE + page[0] + '</loc>\n    <lastmod>' + LAST_MOD +
+    '</lastmod>\n    <changefreq>' + page[2] + '</changefreq>\n    <priority>' + page[1] + '</priority>\n  </url>'
   ),
   '</urlset>',
   ''
@@ -46,6 +58,7 @@ fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), sitemap, 'utf8');
 const robots = [
   'User-agent: *',
   'Allow: /',
+  '# /demo/ pages are kept as noindex references and are not linked from the site.',
   '',
   'Sitemap: ' + SITE + '/sitemap.xml',
   ''
@@ -77,7 +90,7 @@ const demoIndex = `<!DOCTYPE html>
   <title>Backlink Generator Demo Pages - ${pages.length} Keyword Variants</title>
   <meta name="description" content="Browse all ${pages.length} demo pages of the free Backlink Generator Tool: one keyword-focused landing page per SEO use case, each running the same client-side engine.">
   <link rel="canonical" href="${SITE}/demo/">
-  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="robots" content="noindex,follow">
   <meta name="theme-color" content="#2563eb">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Backlink Generator Demo Pages">

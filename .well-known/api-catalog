@@ -1,0 +1,38 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://backlink.is-an.ai/",
+      "service-desc": [
+        {
+          "href": "https://backlink.is-an.ai/llms.txt",
+          "type": "text/plain",
+          "title": "Capabilities, inputs and outputs of the backlink generator, in plain text"
+        },
+        {
+          "href": "https://backlink.is-an.ai/.well-known/agent-skills/index.json",
+          "type": "application/json",
+          "title": "Agent skill that describes how to drive the tool"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://backlink.is-an.ai/how-it-works.html",
+          "type": "text/html",
+          "title": "How the free backlink generator works, step by step"
+        },
+        {
+          "href": "https://backlink.is-an.ai/",
+          "type": "text/html",
+          "title": "The generator itself; every run happens in the visitor's browser"
+        }
+      ],
+      "describedby": [
+        {
+          "href": "https://backlink.is-an.ai/.well-known/ai-catalog.json",
+          "type": "application/json",
+          "title": "Agentic Resource Discovery manifest"
+        }
+      ]
+    }
+  ]
+}

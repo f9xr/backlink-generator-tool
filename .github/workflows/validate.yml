@@ -19,6 +19,7 @@ jobs:
           node --check website-screenshot-preview.js
           node --check pill-nav.js
           node --check magic-bento.js
+          node --check site.js
       - name: Validate templates, demo pages and site files
         run: node tools/validate-site.js
       - name: Engine unit checks
@@ -27,3 +28,5 @@ jobs:
         run: node tools/check-ui.js
       - name: Copy rules (no emoji, no long dashes)
         run: node tools/check-copy.js
+      - name: Internal links and anchors
+        run: node tools/check-links.js

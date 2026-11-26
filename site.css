@@ -589,11 +589,44 @@ details.faq-item[open] .faq-item__icon{
 /* ---------- Legal / guide prose ---------- */
 
 .prose{
-  max-width:72ch;
+  max-width:68ch;
 }
-.prose h2{ margin:var(--s-xxl) 0 var(--s-sm); }
-.prose h2:first-child{ margin-top:0; }
-.prose h3{ margin:var(--s-xl) 0 6px; }
+.prose h2{
+  margin:var(--s-xxxl) 0 var(--s-md);
+  padding-top:var(--s-md);
+  border-top:1px solid var(--hairline);
+  scroll-margin-top:96px;
+}
+.prose h2:first-child{ margin-top:0; padding-top:0; border-top:0; }
+.prose h3{ margin:var(--s-xl) 0 6px; scroll-margin-top:96px; }
+.prose h4{ margin:var(--s-lg) 0 4px; color:var(--ink); font-size:1rem; }
+.prose blockquote{
+  margin:var(--s-lg) 0;
+  padding:2px 0 2px var(--s-lg);
+  border-left:3px solid var(--electric);
+  color:var(--muted);
+  font-size:1rem;
+  line-height:1.75;
+}
+.prose blockquote p:last-child{ margin-bottom:0; }
+.prose hr{
+  margin:var(--s-xxl) 0;
+  border:0;
+  border-top:1px solid var(--hairline);
+}
+.prose code{
+  padding:2px 5px;
+  border:1px solid var(--hairline);
+  border-radius:var(--r-xs);
+  background:var(--surface-deep);
+  font-family:var(--font-mono);
+  font-size:.86em;
+}
+.prose a{ text-decoration:underline; text-underline-offset:2px; }
+.prose table{ width:100%; border-collapse:collapse; margin:var(--s-lg) 0; font-size:.9rem; }
+.prose th,
+.prose td{ padding:9px 12px; border:1px solid var(--hairline); text-align:left; vertical-align:top; }
+.prose th{ background:var(--surface-deep); color:var(--ink); font-weight:700; }
 .prose p,
 .prose li{
   color:#33334A;
@@ -845,6 +878,20 @@ details.faq-item[open] .faq-item__icon{
   line-height:1.5;
 }
 
+@media (max-width:900px){
+  .pill-nav__item{ min-height:44px; }
+  .pill-nav[data-size]{ --pn-h:44px; }
+}
+
+@media (max-width:720px){
+  .footer-bar{ gap:6px var(--s-md); }
+  .footer-bar p{ font-size:11px; }
+  .footer-wordmark{ padding:var(--s-md) 0 var(--s-lg); }
+  .page-hero{ padding:2.5rem 1.25rem 3rem; border-radius:16px; }
+  .page-hero h1{ font-size:clamp(1.85rem,7vw,2.5rem); }
+  .page-hero p{ font-size:1rem; }
+}
+
 /* ---------- Scroll reveal ---------- */
 
 html.has-js .reveal{
@@ -857,28 +904,16 @@ html.has-js .reveal.is-visible{
   transform:translateY(0);
 }
 
-/* ---------- Footer reveal ---------- */
+/* ---------- Footer ---------- */
 
-@media (min-width:900px){
-  html.has-js .site-footer--wide{
-    position:fixed;
-    left:0;
-    right:0;
-    bottom:0;
-    z-index:1;
-    max-height:100vh;
-    overflow:auto;
-    margin-top:0;
-    will-change:transform;
-  }
-  html.has-js body > main{
-    position:relative;
-    z-index:2;
-    margin-bottom:var(--footer-reveal-h,0px);
-    background:var(--canvas);
-    box-shadow:0 0 0 100vmax var(--canvas);
-    clip-path:inset(0 -100vmax);
-  }
+/* The footer stays in normal flow: the earlier fixed-position reveal gave it
+   its own scrollbar whenever it was taller than the viewport. It also clips
+   only the horizontal axis, so the wordmark cannot widen the page. */
+.site-footer--wide{
+  position:relative;
+  z-index:1;
+  overflow-x:clip;
+  overflow-y:visible;
 }
 
 /* ---------- Responsive ---------- */

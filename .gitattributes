@@ -1,0 +1,2 @@
+# Discovery documents are hashed, so never let git rewrite their line endings.
+.well-known/** -text

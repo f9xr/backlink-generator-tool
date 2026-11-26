@@ -1,0 +1,65 @@
+# Free Backlink Generator Tool
+
+> A free, client-side backlink generator. Paste one page URL and the tool fills
+> 4,500+ backlink, ping, social-share and archive templates with that exact page,
+> opens each target once from the visitor's browser, records whether the target
+> loaded, and exports the list as CSV, Excel, PDF or TXT. No account, no backend,
+> no stored URLs.
+
+Canonical: https://backlink.is-an.ai/
+Language: English
+Owner: F9XR Team (https://f9xr.org), hello@f9xr.org
+Last updated: 2026-11-25
+Reviewed by: F9XR Editorial Team
+
+## What the tool does
+
+- Accepts http(s) URLs, bare domains and percent-encoded links, then trims and
+  normalises the value before a run starts.
+- Fills a static template library (backlink forms, ping services, social share
+  endpoints, web archives) with the target URL.
+- De-duplicates hosts, shuffles the order per run and honours an optional batch
+  cap (100, 250, 500, 1,000 or all templates).
+- Opens each target in one of four delivery modes: IFrame (default), Popup, Tab
+  (optionally reused) or Ping through a public CORS proxy.
+- Marks every target as loaded (tick) or failed or blocked (cross). Progress and
+  concurrency are visible while the run is in progress.
+- Exports the finished list as CSV, XLS, PDF or TXT, all generated in the browser.
+- Produces a shareable run link that keeps the target in the query string.
+
+## What it does not do
+
+- It does not create editorial links, and it does not guarantee rankings.
+- Most submissions are index discovery, ping, share and archive signals. Treat
+  them as a crawling and discovery helper, not a replacement for outreach.
+- It does not store URLs, runs or accounts on a server. There is no backend.
+- It does not load analytics or advertising scripts.
+
+## Key pages
+
+- https://backlink.is-an.ai/ : the generator, the step-by-step guide and the
+  backlink explainer.
+- https://backlink.is-an.ai/how-it-works.html : the full technical guide to URL
+  validation, template filling, delivery modes and exports.
+- https://backlink.is-an.ai/report-problem.html : report a dead or unsafe target.
+- https://backlink.is-an.ai/pages/privacy.html : what leaves the browser.
+- https://backlink.is-an.ai/pages/terms.html : terms of use.
+
+## On-device AI assist
+
+The AI assist panel builds a link brief (topic, anchor suggestions, run plan and
+a handoff prompt) from the URL structure alone, in the browser. No API key, no
+model call and no upload. The prompt is meant to be pasted into whichever
+assistant the visitor already uses.
+
+## Safe use
+
+Start with IFrame mode at five concurrent requests, keep runs small and gradual,
+target pages the visitor owns, and check the strongest targets by hand before
+repeating a run. Volume is not a ranking strategy.
+
+## Structured data
+
+The homepage publishes JSON-LD for Organization, WebSite, WebPage,
+WebApplication, HowTo, BreadcrumbList and FAQPage, including a screenshot
+ImageObject and the review date.

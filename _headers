@@ -1,0 +1,15 @@
+# Agent discovery headers (RFC 8288) for hosts that read _headers
+# (Cloudflare Pages, Netlify). GitHub Pages ignores this file.
+
+/*
+  Link: </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json", </.well-known/ai-catalog.json>; rel="describedby"; type="application/json", </llms.txt>; rel="service-doc"; type="text/plain"
+  X-Content-Type-Options: nosniff
+
+/.well-known/api-catalog
+  Content-Type: application/linkset+json
+
+/.well-known/ai-catalog.json
+  Content-Type: application/json
+
+/.well-known/agent-skills/index.json
+  Content-Type: application/json

@@ -1,0 +1,40 @@
+# Canonical URLs for backlink.is-an.ai
+# Generated 2026-11-24. Mirrors sitemap.xml. The retired /demo/ pages are
+# intentionally excluded: they are noindexed and no longer linked.
+
+https://backlink.is-an.ai/
+https://backlink.is-an.ai/how-it-works.html
+https://backlink.is-an.ai/report-problem.html
+https://backlink.is-an.ai/pages/sitemap.html
+https://backlink.is-an.ai/pages/terms.html
+https://backlink.is-an.ai/pages/privacy.html
+https://backlink.is-an.ai/pages/refund.html
+https://backlink.is-an.ai/pages/affiliate-disclosure.html
+https://backlink.is-an.ai/pages/transparency.html
+https://backlink.is-an.ai/pages/dmca.html
+https://backlink.is-an.ai/sitemap.xml
+https://backlink.is-an.ai/all-urls.txt
+https://backlink.is-an.ai/robots.txt
+https://backlink.is-an.ai/ads.txt
+
+# F9XR network linked from this site
+https://f9xr.org
+https://f9xr.org/pages/about.html
+https://f9xr.org/pages/services.html
+https://f9xr.org/pages/portfolio.html
+https://f9xr.org/articles
+https://f9xr.org/articles/press/contact.html
+https://f9xr.org/directories
+https://f9xr.org/troolify
+https://f9xr.org/seo-audit-report-skill
+https://f9xr.org/yoprompts
+https://f9xr.org/boredpup
+https://f9xr.org/dev9b
+
+# Social profiles
+https://linkedin.com/company/f9xrteam
+https://github.com/f9xr
+https://pinterest.com/f9xr
+https://facebook.com/profile.php?id=61586225441401
+https://youtube.com/@QuarterlyLIV
+https://instagram.com/f9xrteam

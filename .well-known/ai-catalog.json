@@ -1,0 +1,53 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Backlink Generator Tool",
+    "identifier": "urn:air:backlink.is-an.ai:site:home"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:backlink.is-an.ai:docs:how-it-works",
+      "displayName": "How the free backlink generator works",
+      "type": "text/html",
+      "url": "https://backlink.is-an.ai/how-it-works.html",
+      "representativeQueries": [
+        "how does the free backlink generator submit a page URL",
+        "which delivery mode should I use for backlink submission",
+        "how do I export the generated backlink list"
+      ]
+    },
+    {
+      "identifier": "urn:air:backlink.is-an.ai:docs:llms",
+      "displayName": "Backlink generator summary for agents",
+      "type": "text/plain",
+      "url": "https://backlink.is-an.ai/llms.txt",
+      "representativeQueries": [
+        "summarise the backlink generator tool for an AI agent",
+        "does the backlink tool need an API key",
+        "what inputs does the backlink generator accept"
+      ]
+    },
+    {
+      "identifier": "urn:air:backlink.is-an.ai:docs:skill",
+      "displayName": "Backlink generator agent skill",
+      "type": "text/markdown",
+      "url": "https://backlink.is-an.ai/.well-known/agent-skills/backlink-generator/SKILL.md",
+      "representativeQueries": [
+        "how do I drive the backlink generator from an agent",
+        "create a backlink submission list for one page URL",
+        "check whether generated backlink targets loaded"
+      ]
+    },
+    {
+      "identifier": "urn:air:backlink.is-an.ai:api:catalog",
+      "displayName": "Backlink generator API catalog",
+      "type": "application/linkset+json",
+      "url": "https://backlink.is-an.ai/.well-known/api-catalog",
+      "representativeQueries": [
+        "which machine readable resources does backlink.is-an.ai publish",
+        "find the documented API for the backlink generator",
+        "agent discovery entry points for the backlink tool"
+      ]
+    }
+  ]
+}

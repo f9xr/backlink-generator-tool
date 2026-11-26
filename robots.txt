@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# Model training is declined; search indexing and answers are allowed.
+Content-Signal: ai-train=no, search=yes, ai-input=yes
+Agentmap: https://backlink.is-an.ai/.well-known/ai-catalog.json
+
 Sitemap: https://backlink.is-an.ai/sitemap.xml
